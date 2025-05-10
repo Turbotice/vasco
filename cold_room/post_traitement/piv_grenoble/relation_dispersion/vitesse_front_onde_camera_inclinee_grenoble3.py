@@ -142,12 +142,14 @@ def routine_vitesse_phase(f_exc=float, freq_acq=float, general_folder=str, dosav
     if plot:
         plt.figure()
         plt.title('$f_{exc}=$'+str(f_exc)+' Hz')
-        plt.imshow(np.flip(matrix.T,axis=1),aspect='auto')
-        plt.plot(Y_MAXS,np.flip(np.arange(len(matrix[0,:]))),'r')
+        plt.imshow(matrix.T,aspect='auto')
+        plt.plot(Y_MAXS,np.arange(len(matrix[0,:])),'r')
         plt.colorbar()
         plt.ylabel('position along profile [PIV box units]',fontsize=15)
         plt.xlabel('time [256 px = T = 1/$f_{exc}$]',fontsize=15)
-        #plt.ylim(np.min(Y_MAXS),np.max(Y_MAXS))
+        #plt.ylim(np.nanmin(Y_MAXS),np.nanmax(Y_MAXS))
+        plt.ylim(0,55)
+        
         plt.show()
 
     ##  fit the line on the spatio-temporal diagram
@@ -177,14 +179,16 @@ def routine_vitesse_phase(f_exc=float, freq_acq=float, general_folder=str, dosav
     return opt[0],np.sqrt(pcov[0][0])
 
 #%% changer generalfolder si besoin
-date = '20241203'
 
-acq_num = 1
-#camera_SN = '40300722'
-camera_SN = '40437120'
+#date = '20241203'
+date = '0507'
+
+acq_num = 4
+camera_SN = '40300722'
+#camera_SN = '40437120'
 
 
-#W = 32
+#W = 64
 #Dt = 20
 W = 64
 Dt = 50
@@ -196,6 +200,9 @@ if computer=='dell_vasco':
     general_folder = f'D:/Gre24/Data/{date}/manip_relation_dispersion/Acquisition_{str(acq_num)}/camera_{camera_SN}/'
 elif computer=='Leyre':
     general_folder = f'/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/{date}/manip_relation_dispersion/Acquisition_{str(acq_num)}/camera_{camera_SN}/'
+
+# pour gre 25 sur Babasse :
+general_folder = f'R:/Gre25/{date}/cameras/manip_relation_dispersion/Acquisition_{str(acq_num)}/camera_{camera_SN}/'
 
 
 
@@ -242,56 +249,24 @@ tab_f_exc,tab_freq_acq = list_all_freq(general_folder=general_folder)
 tab_v_phase = np.zeros(len(tab_f_exc))
 tab_v_phase_err = np.zeros(len(tab_f_exc))
 for i in range(len(tab_f_exc)):
-    tab_v_phase[i],tab_v_phase_err[i] = routine_vitesse_phase(f_exc=tab_f_exc[i],freq_acq=tab_freq_acq[i],general_folder=general_folder,W=W,Dt=Dt,index_profile_line=5,xlim_fit=(0,55),dcm=13,dpx=1280)#,camera_SN='40437120')#'40300722')#)
+    tab_v_phase[i],tab_v_phase_err[i] = routine_vitesse_phase(f_exc=tab_f_exc[i],freq_acq=tab_freq_acq[i],general_folder=general_folder,W=W,Dt=Dt,index_profile_line=5,xlim_fit=(0,30),dcm=16,dpx=1452)#,camera_SN='40437120')#'40300722')#)
 
 #%%  relation dispersion
-"""
-def compute_omega(k,D):
-    return np.sqrt(((D/rho)*k**5 + (T/rho)*k**3 + g*k)*np.tanh(k*H))
-
-def compute_D(e):
-    return (E*(e**3)/(12*(1-nu**2)))
-
-e = 3.0e-3 
-H = 14.5e-2 - e 
-E = 9e9
-nu = 0.4
-D_value = compute_D(e)
-rho = 1e3
-T = 0
-lambdamin = 0.5e-1
-lambdamax = 1
-g = 9.81
-tab_lambda = np.linspace(lambdamin,lambdamax,10000)
-
-mask = (tab_v_phase_err < 1/20*tab_v_phase) & (tab_v_phase>0)
+def v_phase_flexural(f,D):
+    rho=1e3
+    omega = 2*np.pi*f
+    return (D/rho)**(1/5) * omega**(3/5)
 
 
-plt.figure()
-plt.plot((1/(2*np.pi))*compute_omega(2*np.pi/tab_lambda,D_value),tab_lambda * (1/(2*np.pi))*compute_omega(2*np.pi/tab_lambda,D_value),label='E=9GPa')
-E = 1e9
-D_value = compute_D(e)
-plt.plot((1/(2*np.pi))*compute_omega(2*np.pi/tab_lambda,D_value),tab_lambda * (1/(2*np.pi))*compute_omega(2*np.pi/tab_lambda,D_value),label=f'E=1GPa')
-
-#plt.errorbar(np.array(dico_dataset['tab_f_exc'])[mask],np.array(dico_dataset['v_phase'])[mask],np.array(dico_dataset['v_phase_err'])[mask],marker='o')
-plt.errorbar(tab_f_exc[mask],tab_v_phase[mask],tab_v_phase_err[mask],marker='.',linestyle='')
-plt.ylim(0,50)
-plt.xlim(0,300)
-plt.xlabel('frequency (Hz)',fontsize=15)
-plt.ylabel('$v_{\phi}$',fontsize=15)
-plt.legend()
-plt.show()
-
-"""
 E = 6e9
-h = 1e-3
+h = 4e-3
 nu = 0.4
 D = (E*h**3)/(12*(1-nu**2))
 
-mask = (tab_v_phase_err < 1/10*tab_v_phase) & (tab_v_phase>0)
+mask = (tab_v_phase_err < 1/20*tab_v_phase) & (tab_v_phase>0)
 plt.errorbar(tab_f_exc[mask],tab_v_phase[mask],tab_v_phase_err[mask],marker='.',linestyle='')
 plt.plot(tab_f_exc,v_phase_flexural(tab_f_exc,D))
-plt.ylim(0,25)
+plt.ylim(0,35)
 plt.xlim(0,200)
 plt.xlabel('frequency (Hz)',fontsize=15)
 plt.ylabel('$v_{\phi} (m/s)$',fontsize=15)
@@ -403,10 +378,7 @@ def compute_omega(k,D):
 def compute_freq(k,D):
     return (1/(2*np.pi))*compute_omega(k,D)
 
-def v_phase_flexural(f,D):
-    rho=1e3
-    omega = 2*np.pi*f
-    return (D/rho)**(1/5) * omega**(3/5)
+
 
 
 
