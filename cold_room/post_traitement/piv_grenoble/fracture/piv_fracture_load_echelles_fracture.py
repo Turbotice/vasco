@@ -95,17 +95,17 @@ def matcell2dict_PIV(matcell,dim_keys = 0):
 
 
 # %% load data
-W = 64
+W = 32
 Dt = 1
-i0 = 800
-N = 1400
+i0 = 0
+N = 0
 
-date = '20241129'
-acq_num = 7
+date = '0506'
+acq_num = 4
 camera_SN = '22458101'
 
 f_exc = 0.94
-freq_acq = 15
+freq_acq = 20
 
 computer = 'Leyre'
 
@@ -115,8 +115,15 @@ elif computer=='Leyre':
     general_folder = f'/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/{date}/manip_fracture/Acquisition_{str(acq_num)}/camera_{camera_SN}/'
 
 
-
 path2data = f'{general_folder}/{f_exc}Hz_{freq_acq}Hz/matData/'
+matfile = f'{path2data}PIV_processed_i0{i0}_N{N}_Dt{Dt}_b1_W{W}_full_total_processed.mat'
+
+
+#general_folder = f'R:/Gre25/{date}/cameras/frac/img_seq_3/'
+
+general_folder = f'R:/Gre25/{date}/cameras/frac/image_sequence/'
+
+path2data = general_folder + 'matData/'
 matfile = f'{path2data}PIV_processed_i0{i0}_N{N}_Dt{Dt}_b1_W{W}_full_total_processed.mat'
 
 with h5py.File(matfile, 'r') as fmat:
@@ -129,7 +136,7 @@ with h5py.File(matfile, 'r') as fmat:
 ymin = 224
 ymax = 470 # bords de l'eau sur images
 
-t_plot = 1100 - i0 # numero de frame par rapport à la premiere frame considerée dans la piv (i0)
+t_plot = 408 - i0 # numero de frame par rapport à la premiere frame considerée dans la piv (i0)
 
 Vy = mat_dict['Vy']
 Vx = mat_dict['Vx']
@@ -138,8 +145,14 @@ ypix = mat_dict['ypix']
 
 y_indices = np.where((ypix>ymin)&(ypix<ymax))[0]
 
+Vy_converted_px = Vy/freq_acq
+
 plt.figure()
-plt.imshow(Vy[t_plot,y_indices,:],extent=[np.min(xpix),np.max(xpix),np.max(ypix[y_indices]),np.min(ypix[y_indices])])
+plt.imshow(Vy_converted_px[t_plot,y_indices,:],extent=[np.min(xpix),np.max(xpix),np.max(ypix[y_indices]),np.min(ypix[y_indices])],vmin=-4,vmax=4)
+plt.show()
+
+plt.figure()
+plt.imshow(Vy[t_plot,y_indices,:])
 plt.show()
 
 #%% calcul echelles avec photos regle
@@ -159,7 +172,10 @@ def compute_aspect_ratio(y,popt=popt):
     return popt[0]*y+popt[1]
 """
 #%%load file echelles fracture pour avoir en x et y les variations de dpx/dcm
-file_echelles_fracture = '/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/20241129/echelles/echelles_fracture.txt'
+if ordi==Leyre:
+    file_echelles_fracture = '/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/20241129/echelles/echelles_fracture.txt'
+else:
+    
 data_ech_frac = np.loadtxt(file_echelles_fracture,skiprows=1,usecols=range(6))
 
 d = {}

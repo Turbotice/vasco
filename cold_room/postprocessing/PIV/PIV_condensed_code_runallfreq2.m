@@ -2,12 +2,14 @@
 %% inputs of the program
 
 %date = '20241105';
-date = '20241127';
-acq_num = '1';
-camera_SN = '40437120';%'40300722';%
+date = '0506';
+acq_num = '2';
+camera_SN = '40300722';%'40437120';%
 %daily_folder = ['/media/turbots/DATA/thiou/storageshared/Banquise/Vasco/Frigo_pmmh/' date '/manip_f_k_membrane/Acquisition_1/camera_40300722/'];% pour l'instant suppose qu'il n'y a qu'une manip par jour
 %daily_folder = ['F:/manip_grenoble2024/manips_relation_dispersion/' date '/Acquisition_' acq_num '/camera_' camera_SN '/'];
-daily_folder = ['G:/Grenoble/' date '/manip_relation_dispersion/Acquisition_' acq_num '/camera_' camera_SN '/'];
+%daily_folder = ['G:/Grenoble/' date '/manip_relation_dispersion/Acquisition_' acq_num '/camera_' camera_SN '/'];
+daily_folder = ['R:/Gre25/' date '/cameras/manip_relation_dispersion/Acquisition_' acq_num '/camera_' camera_SN '/'];
+
 % Get a list of all files and folders in the directory
 items = dir([daily_folder '*Hz']);
 
@@ -115,7 +117,7 @@ for index_freq = 1:length(list_f_exc_str)
             
         i0 = 0; %process starting from image i0
         N = 0; %number of frames to analyze
-        Dt = 20; %ratio between the fps and the scanning frequency (number of image between image A and image B)
+        Dt = 50; %ratio between the fps and the scanning frequency (number of image between image A and image B)
         b = 1; %number of images between image A and image A' (from one step to an other)
         W = 64;
         

@@ -2,7 +2,7 @@
 %% Definition of the folder to process and where to save the results
 %date = '22042024';
 %date = '20241105';
-date = '0506';
+date = '20241128';
 f_exc = 0.94;
 freq_acq = 20;
 disp(num2str(freq_acq,8));
@@ -12,12 +12,11 @@ camera_SN = '22458101';
 %base = ['G:/Grenoble/' date '/manip_fracture/Acquisition_' acq_num '/camera_' camera_SN '/' num2str(f_exc,8) 'Hz_' num2str(freq_acq,8) 'Hz/'];
 
 
-base = ['R:/Gre25/' date '/cameras/frac/image_sequence/'];
+base = ['R:/Gre25/' date '/cameras/frac/img_seq_3/'];
 
 % folder = [base date '/contexte/video/'];
 optional_sufix = '';
-%folder = [base 'images' optional_sufix '/']; 
-folder = base;
+folder = [base 'images' optional_sufix '/']; 
 filelist = dir([folder 'Basler*.tiff']); dirnames={};
 [dirnames{1:length(filelist),1}] = deal(filelist.name);
 dirnames = sortrows(dirnames);
@@ -63,11 +62,11 @@ for i=1:1%amount
     %    matname=string(strcat(['D:\Surface waves\Wave jet interaction\' date '\matData\'],'jet_', jetstring,'_f_', freq,'Hz_down.mat'));
         %namesave=extractBetween(name, 'z740mm_', '_1');
         
-    i0 = 0; %process starting from image i0
-    N = 0; % last frame
+    i0 = 4000; %process starting from image i0
+    N = 5000; % last frame
     Dt = 1; %ratio between the fps and the scanning frequency (number of image between image A and image B)
     b = 1; %number of images between image A and image A' (from one step to an other)
-    W = 32;
+    W = 64;
     
     %xROI = 1 ;
     %widthroi = 3840;

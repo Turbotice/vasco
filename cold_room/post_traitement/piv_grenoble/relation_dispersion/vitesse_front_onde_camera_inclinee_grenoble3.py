@@ -181,9 +181,9 @@ def routine_vitesse_phase(f_exc=float, freq_acq=float, general_folder=str, dosav
 #%% changer generalfolder si besoin
 
 #date = '20241203'
-date = '0507'
+date = '0506'
 
-acq_num = 4
+acq_num = 2
 camera_SN = '40300722'
 #camera_SN = '40437120'
 
@@ -249,7 +249,7 @@ tab_f_exc,tab_freq_acq = list_all_freq(general_folder=general_folder)
 tab_v_phase = np.zeros(len(tab_f_exc))
 tab_v_phase_err = np.zeros(len(tab_f_exc))
 for i in range(len(tab_f_exc)):
-    tab_v_phase[i],tab_v_phase_err[i] = routine_vitesse_phase(f_exc=tab_f_exc[i],freq_acq=tab_freq_acq[i],general_folder=general_folder,W=W,Dt=Dt,index_profile_line=5,xlim_fit=(0,30),dcm=16,dpx=1452)#,camera_SN='40437120')#'40300722')#)
+    tab_v_phase[i],tab_v_phase_err[i] = routine_vitesse_phase(f_exc=tab_f_exc[i],freq_acq=tab_freq_acq[i],general_folder=general_folder,W=W,Dt=Dt,index_profile_line=3,xlim_fit=(0,45),dcm=16,dpx=1452)#,camera_SN='40437120')#'40300722')#)
 
 #%%  relation dispersion
 def v_phase_flexural(f,D):
@@ -258,20 +258,28 @@ def v_phase_flexural(f,D):
     return (D/rho)**(1/5) * omega**(3/5)
 
 
-E = 6e9
-h = 4e-3
+E = 3e9
+h = 3e-3
 nu = 0.4
 D = (E*h**3)/(12*(1-nu**2))
 
-mask = (tab_v_phase_err < 1/20*tab_v_phase) & (tab_v_phase>0)
+mask = (tab_v_phase_err < 1/30*tab_v_phase) & (tab_v_phase>0)# & (tab_f_exc<100)
+
+popt,pcov = curve_fit(v_phase_flexural, tab_f_exc[mask],tab_v_phase[mask])
+
 plt.errorbar(tab_f_exc[mask],tab_v_phase[mask],tab_v_phase_err[mask],marker='.',linestyle='')
 plt.plot(tab_f_exc,v_phase_flexural(tab_f_exc,D))
-plt.ylim(0,35)
-plt.xlim(0,200)
+plt.plot(tab_f_exc,v_phase_flexural(tab_f_exc,popt[0]),label='fit : D='+str(np.round(popt[0],1))+' +- '+str(np.round(np.sqrt(pcov[0][0])))+' J')
+plt.fill_between(tab_f_exc,v_phase_flexural(tab_f_exc,popt[0]-np.sqrt(pcov[0][0])),v_phase_flexural(tab_f_exc,popt[0]+np.sqrt(pcov[0][0])),color='red',alpha=0.2)
+
+#plt.ylim(0,60)
+#plt.xlim(0,200)
 plt.xlabel('frequency (Hz)',fontsize=15)
 plt.ylabel('$v_{\phi} (m/s)$',fontsize=15)
 plt.legend()
 plt.show()
+
+
 
 # %% creation d'un dictionnaire pour ranger les résultats obtenus
 
