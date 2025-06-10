@@ -19,7 +19,8 @@ import os
 #kerdir = os.getcwd()
 #os.chdir('/home/vzanchi/Bureau/Turbotice_git/')
 
-sys.path.append('C:/Users/Vasco/OneDrive - Université de Paris/Documents/git/icewave')
+#sys.path.append('C:/Users/Vasco/OneDrive - Université de Paris/Documents/git/icewave')
+sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/icewave/')
 
 import icewave.tools.datafolders as df
 import icewave.drone.drone_projection as dp
@@ -70,7 +71,7 @@ def reconstruct_Vz_field_from_pivdata(input_params = dict):
     if ordi=='Leyre':
         base = f'/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/{date}/manip_fracture/Acquisition_{str(acq_num)}/camera_{cam_SN}/{f_exc}Hz_{freq_acq}Hz/'
     elif ordi=='dell_vasco':
-        base =f'D:/Gre24/Data/{date}/manip_fracture/Acquisition_{str(acq_num)}/camera_{cam_SN}/{f_exc}Hz_{freq_acq}Hz/'
+        base =f'L:/Gre24/Data/{date}/manip_fracture/Acquisition_{str(acq_num)}/camera_{cam_SN}/{f_exc}Hz_{freq_acq}Hz/'
     path2data = f'{base}matData/'
     matfile = f'{path2data}PIV_processed_i0{i0}_N{N}_Dt{Dt}_b1_W{W}_full_total_processed.mat'
     
@@ -152,7 +153,7 @@ def reconstruct_Vz_field_from_pivdata(input_params = dict):
 if ordi=='Leyre':
     csv_file_path = "/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/20241128/manip_fracture/Acquisition_3/input_params.csv"
 elif ordi=='dell_vasco':
-    csv_file_path = "D:/Gre24/Data/20241128/manip_fracture/Acquisition_3/input_params.csv"
+    csv_file_path = "L:/Gre24/Data/20241128/manip_fracture/Acquisition_3/input_params.csv"
 
 
 # load input params
@@ -194,6 +195,8 @@ if create_video==True:
 
 
 #%% input values for postprocessing
+
+
 input_values_postprocessing = {}
 
 

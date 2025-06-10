@@ -181,12 +181,12 @@ def routine_vitesse_phase(f_exc=float, freq_acq=float, general_folder=str, dosav
 #%% changer generalfolder si besoin
 
 #date = '20241203'
-date = '0506'
+date = '0514'
 
 acq_num = 2
-camera_SN = '40300722'
+#camera_SN = '40300722'
 #camera_SN = '40437120'
-
+camera_SN = 40307970
 
 #W = 64
 #Dt = 20
@@ -202,7 +202,7 @@ elif computer=='Leyre':
     general_folder = f'/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/{date}/manip_relation_dispersion/Acquisition_{str(acq_num)}/camera_{camera_SN}/'
 
 # pour gre 25 sur Babasse :
-general_folder = f'R:/Gre25/{date}/cameras/manip_relation_dispersion/Acquisition_{str(acq_num)}/camera_{camera_SN}/'
+general_folder = f'R:/Gre25/Data/{date}/cameras/manip_relation_dispersion/Acquisition_{str(acq_num)}/camera_{camera_SN}/'
 
 
 
@@ -249,7 +249,7 @@ tab_f_exc,tab_freq_acq = list_all_freq(general_folder=general_folder)
 tab_v_phase = np.zeros(len(tab_f_exc))
 tab_v_phase_err = np.zeros(len(tab_f_exc))
 for i in range(len(tab_f_exc)):
-    tab_v_phase[i],tab_v_phase_err[i] = routine_vitesse_phase(f_exc=tab_f_exc[i],freq_acq=tab_freq_acq[i],general_folder=general_folder,W=W,Dt=Dt,index_profile_line=3,xlim_fit=(0,45),dcm=16,dpx=1452)#,camera_SN='40437120')#'40300722')#)
+    tab_v_phase[i],tab_v_phase_err[i] = routine_vitesse_phase(f_exc=tab_f_exc[i],freq_acq=tab_freq_acq[i],general_folder=general_folder,W=W,Dt=Dt,index_profile_line=3,xlim_fit=(0,30),dcm=16,dpx=1452)#,camera_SN='40437120')#'40300722')#)
 
 #%%  relation dispersion
 def v_phase_flexural(f,D):
