@@ -40,7 +40,7 @@ def load_complex_field(path_mat_file):
             complex_matrix[i, j] = complex(a, b)
     return complex_matrix    
 
-def load_csv_input_RDD(file_path = '/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/inputs_RDD.csv',skipfirst2rows = True):
+def load_csv_input_RDD(file_path,skipfirst2rows = True):
     # Dictionaries to store categories and lists
     list_categories = []
     dict_lists = {}
@@ -130,6 +130,7 @@ def routine_vitesse_phase(f_exc=float, freq_acq=float, general_folder=str, dosav
         #    Y_MAXS.append(i0)
         #elif ((len(Y_MAXS)!=0)&(abs(Y_MAXS[-1]-i0)>nb_pts_per_period/3)):
         #    Y_MAXS.append(i1)
+        
         elif ((len(Y_MAXS)!=0)&(abs(Y_MAXS[-1]-i0)<=abs(Y_MAXS[-1]-i1))):
             Y_MAXS.append(i0)
         elif ((len(Y_MAXS)!=0)&(abs(Y_MAXS[-1]-i0)>abs(Y_MAXS[-1]-i1))):
@@ -137,7 +138,7 @@ def routine_vitesse_phase(f_exc=float, freq_acq=float, general_folder=str, dosav
         else:
             Y_MAXS.append(np.nan)
 
-            
+    #Y_MAXS = np.unwrap(Y_MAXS,discont=48)    
     ## plot the line to fit on top of the matrix imshow (test)
     if plot:
         plt.figure()
@@ -145,6 +146,7 @@ def routine_vitesse_phase(f_exc=float, freq_acq=float, general_folder=str, dosav
         plt.imshow(matrix.T,aspect='auto')
         plt.plot(Y_MAXS,np.arange(len(matrix[0,:])),'r')
         plt.colorbar()
+
         plt.ylabel('position along profile [PIV box units]',fontsize=15)
         plt.xlabel('time [256 px = T = 1/$f_{exc}$]',fontsize=15)
         #plt.ylim(np.nanmin(Y_MAXS),np.nanmax(Y_MAXS))
@@ -181,9 +183,9 @@ def routine_vitesse_phase(f_exc=float, freq_acq=float, general_folder=str, dosav
 #%% changer generalfolder si besoin
 
 #date = '20241203'
-date = '0514'
+date = '0527'
 
-acq_num = 2
+acq_num = 3
 #camera_SN = '40300722'
 #camera_SN = '40437120'
 camera_SN = 40307970
@@ -249,7 +251,7 @@ tab_f_exc,tab_freq_acq = list_all_freq(general_folder=general_folder)
 tab_v_phase = np.zeros(len(tab_f_exc))
 tab_v_phase_err = np.zeros(len(tab_f_exc))
 for i in range(len(tab_f_exc)):
-    tab_v_phase[i],tab_v_phase_err[i] = routine_vitesse_phase(f_exc=tab_f_exc[i],freq_acq=tab_freq_acq[i],general_folder=general_folder,W=W,Dt=Dt,index_profile_line=3,xlim_fit=(0,30),dcm=16,dpx=1452)#,camera_SN='40437120')#'40300722')#)
+    tab_v_phase[i],tab_v_phase_err[i] = routine_vitesse_phase(f_exc=tab_f_exc[i],freq_acq=tab_freq_acq[i],general_folder=general_folder,W=W,Dt=Dt,index_profile_line=5,xlim_fit=(0,40),dcm=16,dpx=1452)#,camera_SN='40437120')#'40300722')#)
 
 #%%  relation dispersion
 def v_phase_flexural(f,D):
@@ -258,12 +260,13 @@ def v_phase_flexural(f,D):
     return (D/rho)**(1/5) * omega**(3/5)
 
 
-E = 3e9
-h = 3e-3
+E = 7e9
+h = 2.7e-3
 nu = 0.4
 D = (E*h**3)/(12*(1-nu**2))
 
 mask = (tab_v_phase_err < 1/30*tab_v_phase) & (tab_v_phase>0)# & (tab_f_exc<100)
+
 
 popt,pcov = curve_fit(v_phase_flexural, tab_f_exc[mask],tab_v_phase[mask])
 
@@ -285,7 +288,7 @@ plt.show()
 
 # inputs :
 
-list_categories,dict_lists,list_types = load_csv_input_RDD()# le file path est par defaut celui dans hublot
+list_categories,dict_lists,list_types = load_csv_input_RDD(file_path='R:/Gre25/Summary/dispersion_relations/inputs_RDD.csv')# le file path est par defaut celui dans hublot
 
 def assign_input_param2global_variables(dict_lists=dict):
     """
