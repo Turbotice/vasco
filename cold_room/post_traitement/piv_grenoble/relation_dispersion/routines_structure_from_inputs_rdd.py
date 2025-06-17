@@ -155,22 +155,6 @@ elif parallel==False:
         # enlever le try except (il faut avoir tous les fichiers piv prêts...)
 
 
-#%%
-
-for date in dict_results:
-    for acq in dict_results[date]:
-        for cam in dict_results[date][acq]:
-            ddd = dict_results[date][acq][cam]
-            tab_v_phase = ddd['tab_v_phase']
-            tab_v_phase_err = ddd['tab_v_phase_err']
-            tab_f_exc = ddd['tab_f_exc']
-            mask = (tab_v_phase_err < 1/30*tab_v_phase) & (tab_v_phase>0)# & (tab_f_exc<100)
-
-            plt.xlabel('Frequency (Hz)',fontsize=15)
-            plt.ylabel('Phase Velocity (m/s)',fontsize=15)
-            plt.errorbar(tab_f_exc[mask],tab_v_phase[mask],tab_v_phase_err[mask],marker='.',linestyle='')
-            plt.ylim(0,50)
-
 
 #%% enregistrer les données
 
@@ -198,20 +182,3 @@ with open(pkl_file_lists, "wb") as f:
 with open(pkl_file_results, "wb") as f:
     dict_lists = pickle.dump(dict_results,f)
 
-#%% maintenant aller chercher les épaisseurs
-"""
-
-list_h_avg = []
-list_h_err = []
-for i in range(len(dict_lists['rdd_acq_num'])):
-    #data_thickness = np.loadtxt(f'R:/Gre25/Data/thicknesses/thicknesses_rdd_{dict_lists['\ufeffdate'][i][-4:]}_acq{str(dict_lists['rdd_acq_num'][i])}.txt',skiprows=1)
-    data_thickness = np.loadtxt(f'/media/vasco/Samsung_T5/Grenoble/Gre25/Data/thicknesses/thicknesses_rdd_{dict_lists['\ufeffdate'][i][-4:]}_acq{str(dict_lists['rdd_acq_num'][i])}.txt',skiprows=1)
-    #print(f'R:/Gre25/Data/thicknesses/thicknesses_rdd_{dict_lists['\ufeffdate'][i][-4:]}_acq{str(dict_lists['rdd_acq_num'][i])}.txt')
-    array_h = data_thickness[:,1]
-
-    h_avg = np.nanmean(array_h)
-    list_h_avg.append(h_avg)
-    h_std = np.nanstd(array_h)
-    list_h_err.append(h_std)
-    print('h = '+str(h_avg) + ' +- ' + str(h_std))
-"""
