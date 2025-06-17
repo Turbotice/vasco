@@ -17,19 +17,19 @@ from tqdm import tqdm
 import copy  # pour éviter de modifier les données partagées
 #%%
 ##Windows
-#sys.path.append('C:/Users/Vasco/Zanchi/Documents/git_turbotice/')
+sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/')
 ##Linux
-sys.path.append('/media/vasco/OS/Users/Vasco Zanchi/Documents/git_turbotice/')
+#sys.path.append('/media/vasco/OS/Users/Vasco Zanchi/Documents/git_turbotice/')
 from vasco.tools import open_csv
 from functions.disprel import *
 # %% creation d'un dictionnaire pour ranger les résultats obtenus
 
 ##windows
-#inputs_file_path = 'R:/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
+inputs_file_path = 'R:/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
 ##linux_server
 #inputs_file_path = '/media/turbots/GreDisk/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
 ## linux local
-inputs_file_path = '/media/vasco/Samsung_T5/Grenoble/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
+#inputs_file_path = '/media/vasco/Samsung_T5/Grenoble/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
 
 
 # inputs :
@@ -66,7 +66,7 @@ for i in range(len(dict_lists['list_dates'])):
 ######  soit normalement #####################################################
 ##############################################################################
 
-parallel=True
+parallel=False
 
 def process_single_case(i):
     date = dict_lists['list_dates'][i]
@@ -79,8 +79,13 @@ def process_single_case(i):
 
     ## Dossier général (Linux, sur serveur)
     #general_folder = f'/media/turbots/GreDisk/Gre25/Data/{date[-4:]}/cameras/manip_relation_dispersion/Acquisition_{acq}/camera_{cam}/'
+    ##windows, local:
+    #general_folder = f'D:/Grenoble/Gre25/Data/{date[-4:]}/cameras/manip_relation_dispersion/Acquisition_{acq}/camera_{cam}/'
+    ##windows, serveur:
+    general_folder = f'R:/Gre25/Data/{date[-4:]}/cameras/manip_relation_dispersion/Acquisition_{acq}/camera_{cam}/'
+    
     ##linux, local:
-    general_folder = f'/media/vasco/Samsung_T5/Grenoble/Gre25/Data/{date[-4:]}/cameras/manip_relation_dispersion/Acquisition_{acq}/camera_{cam}/'
+    #general_folder = f'/media/vasco/Samsung_T5/Grenoble/Gre25/Data/{date[-4:]}/cameras/manip_relation_dispersion/Acquisition_{acq}/camera_{cam}/'
 
     tab_f_exc, tab_freq_acq = list_all_freq(general_folder=general_folder)
     dd['tab_f_exc'] = tab_f_exc
@@ -132,9 +137,9 @@ elif parallel==False:
         dd['Dt'] = dict_lists['list_Dt'][i]
         #dd['tab_v_phase'] , dd['tab_v_phase_err'] = routine_vitesse_phase(f_exc=tab_f_exc[j],freq_acq=tab_freq_acq[j],general_folder=general_folder,W=dd['W'],Dt=dd['Dt'],index_profile_line=dict_lists['list_indices_profile_line'][i],xlim_fit=(dict_lists['list_xinf'][i],dict_lists['list_xsup'][i]),dcm=dict_lists['list_dcm'][i],dpx=dict_lists['list_dpx'])
         ##windows
-        #general_folder = f'R:/Gre25/Data/{dict_lists['list_dates'][i][-4:]}/cameras/manip_relation_dispersion/Acquisition_{str(dict_lists['list_acq_num'][i])}/camera_{dict_lists['list_camera_SN'][i]}/'
+        general_folder = f'R:/Gre25/Data/{dict_lists['list_dates'][i][-4:]}/cameras/manip_relation_dispersion/Acquisition_{str(dict_lists['list_acq_num'][i])}/camera_{dict_lists['list_camera_SN'][i]}/'
         ##Linux
-        general_folder = f'/media/turbots/GreDisk/Gre25/Data/{dict_lists['list_dates'][i][-4:]}/cameras/manip_relation_dispersion/Acquisition_{str(dict_lists['list_acq_num'][i])}/camera_{dict_lists['list_camera_SN'][i]}/'
+        #general_folder = f'/media/turbots/GreDisk/Gre25/Data/{dict_lists['list_dates'][i][-4:]}/cameras/manip_relation_dispersion/Acquisition_{str(dict_lists['list_acq_num'][i])}/camera_{dict_lists['list_camera_SN'][i]}/'
         print(general_folder)
 
         tab_f_exc,tab_freq_acq = list_all_freq(general_folder=general_folder)
@@ -148,9 +153,6 @@ elif parallel==False:
         dd['tab_v_phase_err'] = tab_v_phase_err
 
         # enlever le try except (il faut avoir tous les fichiers piv prêts...)
-
-#%%
-
 
 
 #%%
@@ -170,13 +172,37 @@ for date in dict_results:
             plt.ylim(0,50)
 
 
+#%% enregistrer les données
+
+system_loc = 'windows_server'
+
+if system_loc=='linux_server':
+    pkl_file_lists = "/media/turbots/GreDisk/Gre25/Summary/dispersion_relations/resultats/dict_lists.pkl"
+elif system_loc=='windows_server':
+    pkl_file_lists = "R:/Gre25/Summary/dispersion_relations/resultats/dict_lists.pkl"
+
+if system_loc=='linux_server':
+    pkl_file_results = "/media/turbots/GreDisk/Gre25/Summary/dispersion_relations/resultats/dict_results.pkl"
+elif system_loc=='windows_server':
+    pkl_file_results = "R:/Gre25/Summary/dispersion_relations/resultats/dict_results.pkl"
+
+
+
+#pkl_file_lists = "/home/vasco/Bureau/donnees_temp/dict_lists.pkl"
+
+# save pickle file
+with open(pkl_file_lists, "wb") as f:
+    dict_lists = pickle.dump(dict_lists,f)
+
+# save pickle file
+with open(pkl_file_results, "wb") as f:
+    dict_lists = pickle.dump(dict_results,f)
 
 #%% maintenant aller chercher les épaisseurs
-
+"""
 
 list_h_avg = []
 list_h_err = []
-
 for i in range(len(dict_lists['rdd_acq_num'])):
     #data_thickness = np.loadtxt(f'R:/Gre25/Data/thicknesses/thicknesses_rdd_{dict_lists['\ufeffdate'][i][-4:]}_acq{str(dict_lists['rdd_acq_num'][i])}.txt',skiprows=1)
     data_thickness = np.loadtxt(f'/media/vasco/Samsung_T5/Grenoble/Gre25/Data/thicknesses/thicknesses_rdd_{dict_lists['\ufeffdate'][i][-4:]}_acq{str(dict_lists['rdd_acq_num'][i])}.txt',skiprows=1)
@@ -188,3 +214,4 @@ for i in range(len(dict_lists['rdd_acq_num'])):
     h_std = np.nanstd(array_h)
     list_h_err.append(h_std)
     print('h = '+str(h_avg) + ' +- ' + str(h_std))
+"""
