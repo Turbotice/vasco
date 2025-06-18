@@ -37,7 +37,7 @@ input_params1['h_camera'] = (35-27.5) * 1e-2
 input_params1['alpha_0_deg'] = 6.9
 input_params1['alpha_0'] = np.radians(input_params1['alpha_0_deg'])
 input_params1['unit_input_velocity'] = 'pxpersec'
-input_params1['box_position_information'] = False
+input_params1['box_position_information'] = True
 input_params1['a'] = 0
 input_params1['W'] = 64
 input_params1['Dt'] = 50
@@ -116,8 +116,10 @@ import icewave.tools.datafolders as df
 import icewave.drone.drone_projection as dp
 
 from PIL import Image
-impath = 'R:/Gre25/Data/0512/cameras/ref_matin/Image__2025-05-12__14-06-34.tiff'
+#impath = 'R:/Gre25/Data/0512/cameras/ref_matin/Image__2025-05-12__14-06-34.tiff'
 impath = 'R:/Gre25/Data/0514/ref/Image__2025-05-14__15-47-53.tiff'
+impath = '/media/turbots/GreDisk/Gre25/Data/0514/ref/Image__2025-05-14__15-47-53.tiff'
+
 im = Image.open(impath)
 #im.show()
 
@@ -148,7 +150,7 @@ Xreal_centers,Yreal_centers = dp.projection_real_space(X, Y, 1920/2, 1200/2, (35
           #                              ,alpha_0,focale)
 
 #%%
-%matplotlib qt
+#%matplotlib qt
 plt.figure()
 plt.pcolormesh(Xreal_centers,Yreal_centers,img_array)
 plt.show()

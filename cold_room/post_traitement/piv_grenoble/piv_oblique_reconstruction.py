@@ -18,22 +18,25 @@ import os
 #os.chdir('/home/vzanchi/Bureau/Turbotice_git/')
 
 #sys.path.append('C:/Users/Vasco/OneDrive - Université de Paris/Documents/git/icewave')
-sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/icewave/')
-
-import icewave.tools.datafolders as df
-import icewave.drone.drone_projection as dp
 #os.chdir(kerdir)
 
-system_loc = 'windows_server'
+system_loc = 'linux_server'
 
 #kerdir = os.getcwd()
 #if ordi=='Leyre':
 #    os.chdir('/run/user/1003/gvfs/smb-share:server=thiou.local,share=homes/vasco/Grenoble_Nov2024/post_traitement/piv_grenoble/fracture/python_functions/')
 if system_loc=='linux_server':
     sys.path.append('/media/turbots/DATA/thiou/homes/vasco/Grenoble_Nov2024/post_traitement/piv_grenoble/fracture/python_functions/')
+    sys.path.append('/media/vasco/OS/Users/Vasco Zanchi/Documents/git_turbotice/icewave/')
 elif system_loc=='windows_server':
     sys.path.append('Z:/vasco/Grenoble_Nov2024/post_traitement/piv_grenoble/fracture/python_functions/')
+    sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/icewave/')
 print(os.listdir())
+
+
+import icewave.tools.datafolders as df
+import icewave.drone.drone_projection as dp
+
 from organize import *
 
 
@@ -77,7 +80,7 @@ def reconstruct_Vz_field_from_pivdata(input_params = dict):
     #elif system_loc=='windows_server':
     #    base =f'R:/Gre24/Data/{date}/manip_fracture/Acquisition_{str(acq_num)}/camera_{cam_SN}/{f_exc}Hz_{freq_acq}Hz/'
     if system_loc=='linux_server':
-         base =f'R:/Gre25/Data/{date}/cameras/manip_relation_dispersion/Acquisition_{str(acq_num)}/camera_{cam_SN}/{f_exc}Hz_{freq_acq}Hz/'
+         base =f'/media/turbots/GreDisk/Gre25/Data/{date}/cameras/manip_relation_dispersion/Acquisition_{str(acq_num)}/camera_{cam_SN}/{f_exc}Hz_{freq_acq}Hz/'
     elif system_loc=='windows_server':
         base =f'R:/Gre25/Data/{date}/cameras/manip_relation_dispersion/Acquisition_{str(acq_num)}/camera_{cam_SN}/{f_exc}Hz_{freq_acq}Hz/'
     
@@ -108,8 +111,11 @@ def reconstruct_Vz_field_from_pivdata(input_params = dict):
         x = np.arange(len(mat_dict['x']))*(W/2) + W + 0.5 # pixel position of each PIV box
         y = np.arange(len(mat_dict['y']))*(W/2) + W + 0.5 # pixel position of each PIV box 
     elif box_position_information==True:
-        x = mat_dict['xpix']
-        y = mat_dict['ypix']
+        #x = mat_dict['xpix']
+        #y = mat_dict['ypix']
+        x = mat_dict['x'] * (W/2)
+        y = np.flip(mat_dict['y']) * (W/2)
+        
         if a!=0:
             x = x[a:-a]
             y = y[a:-a]
@@ -146,8 +152,8 @@ def reconstruct_Vz_field_from_pivdata(input_params = dict):
     fig, ax = plt.subplots()
     pc = ax.pcolormesh(Xreal,Yreal,Vz[:,:,20],shading = 'auto',vmin=-0.01,vmax=0.01) # pcolormesh object !
     fig.colorbar(pc)
-    ax.set_ylim(-0.7,-0.2)
-    ax.set_xlim(-1.0,1.0)
+    #ax.set_ylim(-0.7,-0.2)
+    #ax.set_xlim(-1.0,1.0)
 
     X,Y = np.meshgrid(x,y)
 

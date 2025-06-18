@@ -17,17 +17,17 @@ from tqdm import tqdm
 import copy  # pour éviter de modifier les données partagées
 #%%
 ##Windows
-sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/')
+#sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/')
 ##Linux
-#sys.path.append('/media/vasco/OS/Users/Vasco Zanchi/Documents/git_turbotice/')
+sys.path.append('/media/vasco/OS/Users/Vasco Zanchi/Documents/git_turbotice/')
 from vasco.tools import open_csv
 from functions.disprel import *
 # %% creation d'un dictionnaire pour ranger les résultats obtenus
 
 ##windows
-inputs_file_path = 'R:/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
+#inputs_file_path = 'R:/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
 ##linux_server
-#inputs_file_path = '/media/turbots/GreDisk/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
+inputs_file_path = '/media/turbots/GreDisk/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
 ## linux local
 #inputs_file_path = '/media/vasco/Samsung_T5/Grenoble/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
 
@@ -66,7 +66,7 @@ for i in range(len(dict_lists['list_dates'])):
 ######  soit normalement #####################################################
 ##############################################################################
 
-parallel=False
+parallel=True
 
 def process_single_case(i):
     date = dict_lists['list_dates'][i]
@@ -78,11 +78,11 @@ def process_single_case(i):
     dd['Dt'] = dict_lists['list_Dt'][i]
 
     ## Dossier général (Linux, sur serveur)
-    #general_folder = f'/media/turbots/GreDisk/Gre25/Data/{date[-4:]}/cameras/manip_relation_dispersion/Acquisition_{acq}/camera_{cam}/'
+    general_folder = f'/media/turbots/GreDisk/Gre25/Data/{date[-4:]}/cameras/manip_relation_dispersion/Acquisition_{acq}/camera_{cam}/'
     ##windows, local:
     #general_folder = f'D:/Grenoble/Gre25/Data/{date[-4:]}/cameras/manip_relation_dispersion/Acquisition_{acq}/camera_{cam}/'
     ##windows, serveur:
-    general_folder = f'R:/Gre25/Data/{date[-4:]}/cameras/manip_relation_dispersion/Acquisition_{acq}/camera_{cam}/'
+    #general_folder = f'R:/Gre25/Data/{date[-4:]}/cameras/manip_relation_dispersion/Acquisition_{acq}/camera_{cam}/'
     
     ##linux, local:
     #general_folder = f'/media/vasco/Samsung_T5/Grenoble/Gre25/Data/{date[-4:]}/cameras/manip_relation_dispersion/Acquisition_{acq}/camera_{cam}/'
@@ -158,7 +158,7 @@ elif parallel==False:
 
 #%% enregistrer les données
 
-system_loc = 'windows_server'
+system_loc = 'linux_server'
 
 if system_loc=='linux_server':
     pkl_file_lists = "/media/turbots/GreDisk/Gre25/Summary/dispersion_relations/resultats/dict_lists.pkl"
@@ -182,3 +182,5 @@ with open(pkl_file_lists, "wb") as f:
 with open(pkl_file_results, "wb") as f:
     dict_lists = pickle.dump(dict_results,f)
 
+
+# %%
