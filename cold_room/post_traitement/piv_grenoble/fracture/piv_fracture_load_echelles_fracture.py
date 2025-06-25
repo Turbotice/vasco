@@ -107,13 +107,14 @@ camera_SN = '22458101'
 f_exc = 0.94
 freq_acq = 20
 
-computer = 'Leyre'
+computer = 'adour'
 
-if computer=='DellVasco':
-    general_folder = f'K:/Gre24/Data/{date}/manip_fracture/Acquisition_{str(acq_num)}/camera_{camera_SN}/'
-elif computer=='Leyre':
-    general_folder = f'/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/{date}/manip_fracture/Acquisition_{str(acq_num)}/camera_{camera_SN}/'
+#if computer=='DellVasco':
+#    general_folder = f'K:/Gre24/Data/{date}/manip_fracture/Acquisition_{str(acq_num)}/camera_{camera_SN}/'
+#elif computer=='Leyre':
+#    general_folder = f'/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/{date}/manip_fracture/Acquisition_{str(acq_num)}/camera_{camera_SN}/'
 
+general_folder = f'/media/turbots/GreDisk/Gre25/Data/{date}/cameras/frac/image_sequence/'
 
 path2data = f'{general_folder}/{f_exc}Hz_{freq_acq}Hz/matData/'
 matfile = f'{path2data}PIV_processed_i0{i0}_N{N}_Dt{Dt}_b1_W{W}_full_total_processed.mat'
@@ -121,7 +122,7 @@ matfile = f'{path2data}PIV_processed_i0{i0}_N{N}_Dt{Dt}_b1_W{W}_full_total_proce
 
 #general_folder = f'R:/Gre25/{date}/cameras/frac/img_seq_3/'
 
-general_folder = f'R:/Gre25/{date}/cameras/frac/image_sequence/'
+#general_folder = f'R:/Gre25/{date}/cameras/frac/image_sequence/'
 
 path2data = general_folder + 'matData/'
 matfile = f'{path2data}PIV_processed_i0{i0}_N{N}_Dt{Dt}_b1_W{W}_full_total_processed.mat'
@@ -172,11 +173,11 @@ def compute_aspect_ratio(y,popt=popt):
     return popt[0]*y+popt[1]
 """
 #%%load file echelles fracture pour avoir en x et y les variations de dpx/dcm
-if ordi==Leyre:
+if computer=='Leyre':
     file_echelles_fracture = '/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/20241129/echelles/echelles_fracture.txt'
 else:
-    
-data_ech_frac = np.loadtxt(file_echelles_fracture,skiprows=1,usecols=range(6))
+    file_echelles_fracture = '/media/turbots/GreDisk/Gre25/Data/0507/cameras/ref_matin/echelles.txt'
+data_ech_frac = np.loadtxt(file_echelles_fracture,skiprows=1,usecols=range(5))
 
 d = {}
 d['xmoy'] = data_ech_frac[:,1]
