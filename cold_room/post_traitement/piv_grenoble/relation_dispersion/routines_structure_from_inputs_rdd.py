@@ -16,10 +16,15 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
 import copy  # pour éviter de modifier les données partagées
 #%%
+system_loc = 'windows_server'
+
+
 ##Windows
-#sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/')
+if system_loc=='windows_server':
+    sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/')
 ##Linux
-sys.path.append('/media/vasco/OS/Users/Vasco Zanchi/Documents/git_turbotice/')
+elif system_loc=='linux_server':
+    sys.path.append('/media/vasco/OS/Users/Vasco Zanchi/Documents/git_turbotice/')
 from vasco.tools import open_csv
 from functions.disprel import *
 # %% creation d'un dictionnaire pour ranger les résultats obtenus
