@@ -22,17 +22,21 @@ system_loc = 'windows_server'
 ##Windows
 if system_loc=='windows_server':
     sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/')
+    #sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/vasco/cold_room/post_traitement/piv_grenoble/relation_dispersion')
+    
 ##Linux
 elif system_loc=='linux_server':
     sys.path.append('/media/vasco/OS/Users/Vasco Zanchi/Documents/git_turbotice/')
 from vasco.tools import open_csv
-from functions.disprel import *
+from vasco.cold_room.post_traitement.piv_grenoble.relation_dispersion.functions.disprel import *
 # %% creation d'un dictionnaire pour ranger les résultats obtenus
 
 ##windows
-#inputs_file_path = 'R:/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
+if system_loc=='windows_server':
+    inputs_file_path = 'R:/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
 ##linux_server
-inputs_file_path = '/media/turbots/GreDisk/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
+elif system_loc=='linux_server':
+    inputs_file_path = '/media/turbots/GreDisk/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
 ## linux local
 #inputs_file_path = '/media/vasco/Samsung_T5/Grenoble/Gre25/Summary/dispersion_relations/inputs_RDD.csv'
 
@@ -42,6 +46,9 @@ inputs_file_path = '/media/turbots/GreDisk/Gre25/Summary/dispersion_relations/in
 
 
 
+for i in range(len(list_categories)):
+    if list_categories[i]=='\ufefflist_dates':
+        list_categories[i] = 'list_dates'
 
 print(list_categories)
 print(list_types)
@@ -54,7 +61,6 @@ print(list_types)
 
 if '\ufefflist_dates' in dict_lists:
     dict_lists['list_dates'] = dict_lists.pop('\ufefflist_dates')
-
 
 dict_results = {}
 for i in range(len(dict_lists['list_dates'])):
@@ -71,7 +77,7 @@ for i in range(len(dict_lists['list_dates'])):
 ######  soit normalement #####################################################
 ##############################################################################
 
-parallel=True
+parallel=False
 
 def process_single_case(i):
     date = dict_lists['list_dates'][i]
@@ -163,7 +169,6 @@ elif parallel==False:
 
 #%% enregistrer les données
 
-system_loc = 'linux_server'
 
 if system_loc=='linux_server':
     pkl_file_lists = "/media/turbots/GreDisk/Gre25/Summary/dispersion_relations/resultats/dict_lists.pkl"
