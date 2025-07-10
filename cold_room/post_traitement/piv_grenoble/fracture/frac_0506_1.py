@@ -730,10 +730,27 @@ for n in range(1, nt):
     x_prev = X_lag[n - 1]  # (n_particles,)
 
     y_prev = Y_lag[n - 1]  # (n_particles,)
-
     # essayer en appliquant un filtre gaussien sur les profils à chaque pas de temps
-    
+    """
+    x_prev_reshaped = np.reshape(x_prev,(len(ypix),len(xpix)))
+    fft_xprev_reshaped = np.fft.fft(x_prev_reshaped,axis=1)
+    fft_xprev_reshaped[:,3:-3] = 0
+    x_prev_reshaped_filt = np.real(np.fft.ifft(fft_xprev_reshaped,axis=1))
 
+    #x_prev_reshaped_smoothed = gaussian_filter1d(x_prev_reshaped,sigma=3,axis=1)
+
+    y_prev_reshaped = np.reshape(y_prev,(len(ypix),len(xpix)))
+    fft_yprev_reshaped = np.fft.fft(y_prev_reshaped,axis=1)
+    fft_yprev_reshaped[:,3:-3] = 0
+    y_prev_reshaped_filt = np.real(np.fft.ifft(fft_yprev_reshaped,axis=1))
+
+
+    #y_prev_reshaped_smoothed = gaussian_filter1d(y_prev_reshaped,sigma=3,axis=1)
+
+    x_prev = np.ravel(x_prev_reshaped_filt)
+    y_prev = np.ravel(y_prev_reshaped_filt)
+    
+    """
     # Interpolateurs sur tout le batch
     # ATTENTION : certains interpolateurs comme scipy's RegularGridInterpolator nécessitent des inputs (N, 3)
     points = np.stack([np.full_like(x_prev, t_prev), y_prev, x_prev], axis=-1)  # shape: (n_particles, 3)
@@ -745,7 +762,6 @@ for n in range(1, nt):
 
 
 
-# là on définit la fonction pour un pas de temps pour le cas où parallel=True
 
 
 plot_traj=True
@@ -776,20 +792,20 @@ y_lag_along_profile = Y_lag[:,len(xpix)*idx_profile:len(xpix)*(idx_profile+1)]
 
 
 plt.figure()
-plt.plot(y_lag_along_profile[:,50])
+plt.plot(y_lag_along_profile[9,:])
 plt.show()
 
 # fracture à frame 700
-
+#%%
 plt.figure()
-for i in range(100,120,1):
-    plt.plot(x_lag_along_profile[i,:],y_lag_along_profile[i,:])
+for i in range(500,510,1):
+    plt.plot(y_lag_along_profile[i,:])
 plt.show()
 
 # pour l'instant rien de mieux que le champ de vitesses euleriennes...
 # %%
 
-
+plt.close('all')
 
 
 
