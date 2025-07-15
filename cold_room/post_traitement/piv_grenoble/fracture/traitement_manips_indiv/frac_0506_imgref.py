@@ -100,17 +100,18 @@ def matcell2dict_PIV(matcell,dim_keys = 0):
 # %% load data
 W = 64
 #Dt = 1 # pour ce cas pas de Dt car on compare tout par rapport à une même image de reference
-i0 = 22
+i0 = 24
 N = 0
-refimg = 22
+refimg = 24
 
 date = '0506'
 
 #camera_SN = '22458101'
 
-f_exc = 0.94
+#f_exc = 0.94
 freq_acq = 20
 
+frame_frac = 699
 #computer = 'adour'
 
 system_loc = 'windows_server'
@@ -154,48 +155,40 @@ u = -u
 v = -v
 
 # %% visualize piv data
-"""
-ymin = 100
-ymax = 400 # bords de l'eau sur images
-
-t_plot = 408 - i0 # numero de frame par rapport à la premiere frame considerée dans la piv (i0)
-
-Vy = mat_dict['Vy']
-Vx = mat_dict['Vx']
-xpix = mat_dict['xpix']
-ypix = mat_dict['ypix']
-
-y_indices = np.where((ypix>ymin)&(ypix<ymax))[0]
-
-Vx_converted_px = Vx/freq_acq
-Vy_converted_px = Vy/freq_acq
-
-plt.figure()
-plt.imshow(Vy_converted_px[t_plot,y_indices,:],extent=[np.min(xpix),np.max(xpix),np.max(ypix[y_indices]),np.min(ypix[y_indices])],vmin=-np.max(Vy_converted_px)/5,vmax=np.max(Vy_converted_px)/5)
-plt.show()
-
-plt.figure()
-plt.imshow(Vy[t_plot,y_indices,:])
-plt.show()
-"""
-
-
-
-
 yind = 4 # il vaut mieux utiliser les coordonnées en pixels
 
 plt.figure()
-plt.imshow(v[10])
+plt.title('elevation map (px) at frame 10')
+plt.imshow(v[10],vmin=-3,vmax=3)
 plt.colorbar()
 plt.show()
 
 
 plt.figure()
+plt.title('profile at yind='+str(yind)+' for the first frames')
 for i in range(40):
     plt.plot(v[i,yind,:],label=str(i))
 plt.legend()
 plt.show()
 
+
+
+
+frame_plot = frame_frac - 5
+
+plt.figure()
+plt.title('elevation map (px) at frame '+str(frame_plot))
+plt.imshow(v[frame_plot-i0],vmin=-5,vmax=5)
+plt.colorbar()
+plt.show()
+
+
+plt.figure()
+plt.title('profile : '+str(yind)+' , frame frac = '+str(frame_frac))
+for i in range(frame_plot-i0,frame_plot+10-i0): # fenetre temporelle où il y a la fracture
+    plt.plot(v[i,yind,:],label=str(i+i0))
+plt.legend()
+plt.show()
 
 
 #%% partie pour trouver image de reference
@@ -222,6 +215,46 @@ plt.plot(v[tind_profile_centre,yind,:],label=str(tind_profile_centre))
 
 plt.legend()
 plt.show()
+
+
+u_shifted = u - np.tile(u_field_centre,(u.shape[0],1,1))
+v_shifted = v - np.tile(v_field_centre,(v.shape[0],1,1))
+
+plt.figure()
+plt.title('profile (shifted) at yind='+str(yind)+' for the first frames')
+for i in range(100,140):
+    plt.plot(v_shifted[i,yind,:],label=str(i))
+plt.legend()
+plt.show()
+
+# à faire dans un second temps : utiliser v_shifted à la place de v et moyenner les les v_field_centre pour ameliorer correction
+
+# %% courbure de la plaque juste avant la fracture ?
+
+xvals = np.arange(v.shape[2]) * 0.075 * W/2 * 1e-2
+v_converted_meters = v * 0.075 * 1e-2
+
+
+# 0.075 est la valeur approximative de dcm/dpx, mais une utilisation de la variation de dcm/dpx 
+# est requise pour une meilleure estimation de kappa_c
+
+
+ind_inf_fit = 20
+ind_sup_fit = 42
+print(xvals)
+fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
+print(fit_params)
+
+plt.figure()
+plt.title('profile at yind='+str(yind))
+plt.plot(xvals,v_converted_meters[frame_frac-i0,yind,:],label='frame '+str(frame_frac))
+plt.plot(xvals[ind_inf_fit:ind_sup_fit],(fit_params[0]*xvals**2 + fit_params[1]*xvals + fit_params[2])[ind_inf_fit:ind_sup_fit],label='fit : $\kappa$ = '+str(np.round(2*fit_params[0],3)))
+plt.legend()
+plt.show()
+
+kappa_c = 2*fit_params[0]
+
+
 
 
 #%% calcul echelles avec photos regle
@@ -263,6 +296,7 @@ d['xmoy'] = data_ech_frac[:,0]
 d['ymoy'] = data_ech_frac[:,1]
 d['dcm'] = data_ech_frac[:,2]
 d['dpx'] = data_ech_frac[:,3]
+d['ypix_surf'] = data_ech_frac[:,4]
 #d['delta_y'] = data_ech_frac[:,5]
 
 d['tab_ymoy_refmanip'] = d['ymoy']# - d['delta_y']
@@ -306,10 +340,12 @@ def linfitinterp(x,d=d,plot=False):
         plt.show()
     return popt,pcov
 
-def compute_aspect_ratio(x,y,d=d):
-    popt,pcov = linfitinterp(x,d=d)
+
+def compute_aspect_ratio(x,y,d=d,plot=False):
+    popt,_ = linfitinterp(x,d=d,plot=plot)
     dcm_sur_dpx = popt[0]*y+popt[1]
     return dcm_sur_dpx    
 
+#%% calcul de tab_dcmsurdpx pour toutes les positions de cases piv (x,y) (avec x et y en pixels)
 
-# %% 
+mat_dict['x']
