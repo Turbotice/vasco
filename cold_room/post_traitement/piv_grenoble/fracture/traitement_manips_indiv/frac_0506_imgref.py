@@ -154,6 +154,12 @@ v = reshape_array(v_original)
 u = -u
 v = -v
 
+xpix = mat_dict['x'][0][0][0]
+ypix = mat_dict['y'][0][0][:,0]
+
+
+
+
 # %% visualize piv data
 yind = 4 # il vaut mieux utiliser les coordonnées en pixels
 
@@ -348,4 +354,63 @@ def compute_aspect_ratio(x,y,d=d,plot=False):
 
 #%% calcul de tab_dcmsurdpx pour toutes les positions de cases piv (x,y) (avec x et y en pixels)
 
-mat_dict['x']
+XPIX,YPIX = np.meshgrid(xpix,ypix)
+
+DCM_SUR_DPX = interp_function(XPIX,YPIX)
+
+plt.figure()
+plt.imshow(DCM_SUR_DPX)
+plt.show()
+
+DCM_SUR_DPX_2 = np.zeros((DCM_SUR_DPX.shape[0],DCM_SUR_DPX.shape[1]))
+for j in range(len(ypix)):
+    for i in range(len(xpix)):
+        try:
+            DCM_SUR_DPX_2[j,i] = compute_aspect_ratio(xpix[i],ypix[j],d=d)
+        except:
+            DCM_SUR_DPX_2[j,i] = np.nan
+
+plt.figure()
+plt.imshow(DCM_SUR_DPX_2)
+plt.colorbar()
+plt.show()
+
+DcmSurDpx_3dim = np.tile(DCM_SUR_DPX_2,(u.shape[0],1,1))
+
+v_cm = DcmSurDpx_3dim * v
+
+plt.figure()
+plt.plot(xvals,v[frame_frac-i0,yind,:]*0.075,label='frame '+str(frame_frac))
+plt.plot(xvals,v_cm[frame_frac-i0,yind,:],label='frame '+str(frame_frac))
+
+plt.show()
+
+
+
+
+xvals = np.arange(v.shape[2]) * 0.075 * W/2 * 1e-2
+v_converted_meters = v_cm * 1e-2
+
+
+# 0.075 est la valeur approximative de dcm/dpx, mais une utilisation de la variation de dcm/dpx 
+# est requise pour une meilleure estimation de kappa_c
+
+
+ind_inf_fit = 20
+ind_sup_fit = 42
+for yind in [3,4,5,6,7]:
+    print(xvals)
+    fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
+    print(fit_params)
+
+    plt.figure()
+    plt.title('profile at yind='+str(yind))
+    plt.plot(xvals,v_converted_meters[frame_frac-i0,yind,:],label='frame '+str(frame_frac))
+    plt.plot(xvals[ind_inf_fit:ind_sup_fit],(fit_params[0]*xvals**2 + fit_params[1]*xvals + fit_params[2])[ind_inf_fit:ind_sup_fit],label='fit : $\kappa$ = '+str(np.round(2*fit_params[0],3)))
+    plt.legend()
+    plt.show()
+
+    kappa_c = 2*fit_params[0]
+    print(kappa_c)
+
+# %%
