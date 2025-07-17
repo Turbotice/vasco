@@ -12,6 +12,13 @@ import re
 from scipy.signal import savgol_filter
 from scipy.optimize import curve_fit
 from scipy.interpolate import LinearNDInterpolator
+
+import sys
+
+sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/vasco/cold_room/post_traitement/piv_grenoble/fracture/python_functions/')
+
+from spatial_scale import *
+
 #matplotlib.use('TkAgg')
 # %%
 
@@ -82,6 +89,8 @@ freq_acq = 20
 
 frame_frac = 3209
 #computer = 'adour'
+ypix_surf = 486
+
 
 system_loc = 'windows_server'
 
@@ -124,6 +133,12 @@ Vy = mat_dict['Vy']
 u = -Vx * (1/freq_acq)
 v = -Vy * (1/freq_acq)
 
+
+xpix = mat_dict['xpix']
+ypix = mat_dict['ypix']
+
+
+
 #%%
 
 yind = 9 # il vaut mieux utiliser les coordonnées en pixels
@@ -131,43 +146,20 @@ yind = 9 # il vaut mieux utiliser les coordonnées en pixels
 frame_plot = frame_frac - 8
 
 plt.figure()
-plt.title('vertical displacement map (px)')
+plt.title('vertical displacement map (px/frame)')
 plt.imshow(v[frame_plot-i0],vmin=-2.5,vmax=2.5)
 plt.colorbar()
 plt.show()
 
 
 plt.figure()
-plt.title('displacement profiles (px). frame frac = '+str(frame_frac))
+plt.title('displacement profiles (px/frame). frame frac = '+str(frame_frac))
 for i in range(frame_plot-i0,frame_plot+10-i0): # fenetre temporelle où il y a la fracture
     plt.plot(v[i,yind,:],label=str(i+i0))
 plt.legend()
 plt.show()
 
-# %% courbure de la plaque juste avant la fracture ?
-"""
-xvals = np.arange(v.shape[2]) * 0.075 * W/2 * 1e-2
-v_converted_meters = v * 0.075 * 1e-2
 
-# 0.075 est la valeur approximative de dcm/dpx, mais une utilisation de la variation de dcm/dpx 
-# est requise pour une meilleure estimation de kappa_c
-
-
-ind_inf_fit = 20
-ind_sup_fit = 40
-print(xvals)
-fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
-print(fit_params)
-
-plt.figure()
-plt.title('velocity profile (px) at yind='+str(yind))
-plt.plot(xvals,v_converted_meters[frame_frac-i0,yind,:],label='frame '+str(frame_frac))
-plt.plot(xvals[ind_inf_fit:ind_sup_fit],(fit_params[0]*xvals**2 + fit_params[1]*xvals + fit_params[2])[ind_inf_fit:ind_sup_fit],label='fit : $\kappa$ = '+str(np.round(2*fit_params[0],3)))
-plt.legend()
-plt.show()
-
-kappa_c = 2*fit_params[0]
-"""
 # %% amplitude max de la vitesse juste avant que ça casse et conversion en amplitude en metres
 frame_Vy_max = 3204
 
@@ -200,4 +192,154 @@ plt.plot(xvals[ind_inf_fit:ind_sup_fit],(fit_params[0]*xvals**2 + fit_params[1]*
 plt.legend()
 plt.show()
 """
+
+#%%load file echelles fracture pour avoir en x et y les variations de dpx/dcm
+#if computer=='Leyre':
+#    file_echelles_fracture = '/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/20241129/echelles/echelles_fracture.txt'
+if system_loc=='windows_server':
+    file_echelles_fracture = 'R:/Gre25/Data/0512/cameras/ref_matin/echelles.txt'
+elif system_loc=='linux_server':
+    file_echelles_fracture = '/media/turbots/GreDisk/Gre25/Data/0512/cameras/ref_matin/echelles.txt'
+data_ech_frac = np.loadtxt(file_echelles_fracture,skiprows=1,usecols=range(5))
+
+d = {}
+"""
+d['xmoy'] = data_ech_frac[:,1]
+d['ymoy'] = data_ech_frac[:,2]
+d['dcm'] = data_ech_frac[:,3]
+d['dpx'] = data_ech_frac[:,4]
+d['delta_y'] = data_ech_frac[:,5]
+
+d['tab_ymoy_refmanip'] = d['ymoy'] - d['delta_y']
+"""
+d['xmoy'] = data_ech_frac[:,0]
+d['ymoy'] = data_ech_frac[:,1]
+d['dcm'] = data_ech_frac[:,2]
+d['dpx'] = data_ech_frac[:,3]
+d['ypix_surf_ref'] = data_ech_frac[:,4]
+
+delta_y = d['ypix_surf_ref'] - ypix_surf
+
+d['tab_ymoy_refmanip'] = d['ymoy'] - delta_y
+
+
+
+rng = np.random.default_rng()
+x = d['xmoy']
+y = d['tab_ymoy_refmanip']
+z = d['dcm']/d['dpx']
+X = np.linspace(min(x), max(x))
+Y = np.linspace(min(y), max(y))
+X, Y = np.meshgrid(X, Y)  # 2D grid for interpolation
+interp_function = LinearNDInterpolator(list(zip(x, y)), z)
+
+d['interp_function'] = interp_function
+
+Z = interp_function(X, Y)
+plt.pcolormesh(X, Y, Z, shading='auto')
+plt.plot(x, y, "ok", label="input point")
+plt.legend()
+plt.colorbar()
+plt.axis("equal")
+plt.xlabel('xmoy')
+plt.ylabel('ymoy')
+plt.xlim(np.min(x)-50,np.max(x)+50)
+plt.show()
+#%% calcul de tab_dcmsurdpx pour toutes les positions de cases piv (x,y) (avec x et y en pixels)
+
+if len(xpix)!=v.shape[2]:
+    xpix = xpix[:-(len(xpix)-v.shape[2])]
+else:
+    pass
+
+if len(ypix)!=v.shape[2]:
+    ypix = ypix[:-(len(ypix)-v.shape[1])]
+else:
+    pass
+
+
+XPIX,YPIX = np.meshgrid(xpix,ypix)
+
+DCM_SUR_DPX = interp_function(XPIX,YPIX)
+
+plt.figure()
+plt.imshow(DCM_SUR_DPX)
+plt.show()
+
+DCM_SUR_DPX_2 = np.zeros((DCM_SUR_DPX.shape[0],DCM_SUR_DPX.shape[1]))
+for j in range(len(ypix)):
+    for i in range(len(xpix)):
+        try:
+            DCM_SUR_DPX_2[j,i] = compute_aspect_ratio(xpix[i],ypix[j],d=d)
+        except:
+            DCM_SUR_DPX_2[j,i] = np.nan
+
+plt.figure()
+plt.imshow(DCM_SUR_DPX_2)
+plt.colorbar()
+plt.show()
+
+DcmSurDpx_3dim = np.tile(DCM_SUR_DPX_2,(u.shape[0],1,1))
+
+v_cm = DcmSurDpx_3dim * v
+
+
+
+xvals_px = np.arange(v.shape[2]) * W/2
+xvals =  xvals_px * DCM_SUR_DPX_2[yind,:] * 1e-2
+v_converted_meters = v_cm * 1e-2
+#v_converted_meters_1 = v * 0.07 * 1e-2
+
+#%%
+plt.figure()
+#plt.plot(xvals,v[frame_frac-i0,yind,:]*0.075,label='frame '+str(frame_frac))
+plt.plot(xvals,v_cm[frame_Vy_max-i0,yind,:],label='frame '+str(frame_frac))
+
+plt.show()
+
+# %% affichage de differents profils avec correction angulaire vs y 
+# et variation echelle horizontale vs y
+
+array_alphas = np.zeros(len(ypix))
+
+for i in range(len(ypix)):
+    array_alphas[i] = compute_angle(ypix[i],ypix_surf)
+array_alphas = np.reshape(array_alphas,(len(array_alphas),1))
+ArrAlph = np.tile(array_alphas, (v.shape[0],1,v.shape[2]))
+#print(ArrAlph[0,0,:])
+#print(ArrAlph[0,:,0])
+v_angle_corrected = v_converted_meters/np.cos(ArrAlph)
+
+kappa_c_vals = []
+
+yindices = np.array([3,4,5])
+
+ind_inf_fit = 20
+ind_sup_fit = 42
+xvals_fit = xvals[ind_inf_fit:ind_sup_fit]
+
+plt.figure()
+for yind in yindices:
+    #print(xvals)
+    fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_angle_corrected[frame_Vy_max-i0,yind,ind_inf_fit:ind_sup_fit],2)
+    #print(fit_params)
+#    fit_params_2 = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
+#    plt.figure()
+    plt.title('profiles at frame '+str(frame_frac))
+#    plt.plot(xvals,v_converted_meters[frame_frac-i0,yind,:],label='yind='+str(yind))
+    plt.plot(xvals,v_angle_corrected[frame_Vy_max-i0,yind,:],label='yind='+str(yind))
+    plt.plot(xvals_fit,fit_params[0]*xvals_fit**2+fit_params[1]*xvals_fit+fit_params[2],label='fit',color='red',alpha=0.5)
+    plt.plot()
+    plt.legend()
+#    plt.show()
+
+    kappa_c = 2*fit_params[0]
+    print('kappac',kappa_c)
+    kappa_c_vals.append(kappa_c)
+
+plt.show()
+
+print(np.mean(np.array(kappa_c_vals)))
+print(np.std(np.array(kappa_c_vals)))
+
 # %%

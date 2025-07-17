@@ -105,13 +105,16 @@ N = 0
 refimg = 24
 
 date = '0506'
+name_frac_file = 'image_sequence'
 
 #camera_SN = '22458101'
 
 #f_exc = 0.94
 freq_acq = 20
 
-frame_frac = 699
+frame_frac = 698
+
+ypix_surf = 400
 #computer = 'adour'
 
 system_loc = 'windows_server'
@@ -391,13 +394,8 @@ plt.show()
 xvals = np.arange(v.shape[2]) * 0.075 * W/2 * 1e-2
 v_converted_meters = v_cm * 1e-2
 
-
-# 0.075 est la valeur approximative de dcm/dpx, mais une utilisation de la variation de dcm/dpx 
-# est requise pour une meilleure estimation de kappa_c
-
-
-ind_inf_fit = 20
-ind_sup_fit = 42
+#%% hidden cell
+'''
 for yind in [3,4,5,6,7]:
     print(xvals)
     fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
@@ -412,5 +410,85 @@ for yind in [3,4,5,6,7]:
 
     kappa_c = 2*fit_params[0]
     print(kappa_c)
+'''
+# %% affichage de differents profils avec correction angulaire vs y 
+# et variation echelle horizontale vs y
+
+
+sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/vasco/cold_room/post_traitement/piv_grenoble/fracture/python_functions/')
+
+from spatial_scale import *
+
+array_alphas = np.zeros(len(ypix))
+
+for i in range(len(ypix)):
+    array_alphas[i] = compute_angle(ypix[i],ypix_surf)
+array_alphas = np.reshape(array_alphas,(len(array_alphas),1))
+ArrAlph = np.tile(array_alphas, (v.shape[0],1,v.shape[2]))
+#print(ArrAlph[0,0,:])
+#print(ArrAlph[0,:,0])
+v_angle_corrected = v_converted_meters/np.cos(ArrAlph)
+
+
+ind_inf_fit = 22
+ind_sup_fit = 40
+
+xvals_fit = xvals[ind_inf_fit:ind_sup_fit]
+
+kappa_c_vals = []
+
+yindices = np.array([3,4,5,6])
+
+plt.figure()
+for yind in yindices:
+    #print(xvals)
+    fit_params = np.polyfit(xvals_fit,v_angle_corrected[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
+    #print(fit_params)
+#    fit_params_2 = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
+#    plt.figure()
+    plt.title('profiles at frame '+str(frame_frac))
+#    plt.plot(xvals,v_converted_meters[frame_frac-i0,yind,:],label='yind='+str(yind))
+    plt.plot(xvals,v_angle_corrected[frame_frac-i0,yind,:],'.',label='yind='+str(yind))
+    plt.plot(xvals_fit,fit_params[0]*xvals_fit**2+fit_params[1]*xvals_fit+fit_params[2],label='fit',color='red')
+    plt.plot()
+    plt.legend()
+#    plt.show()
+
+    kappa_c = 2*fit_params[0]
+    print('kappac',kappa_c)
+    kappa_c_vals.append(kappa_c)
+
+plt.show()
+
+print(np.mean(np.array(kappa_c_vals)))
+print(np.std(np.array(kappa_c_vals)))
+
+
+# %%
+file_dict_results = 'R:/Gre25/Summary/fracture_postprocessing/resultats/fracture_results.pkl'
+
+if os.path.exists(file_dict_results):
+    with open(file_dict_results, 'rb') as f:
+        dict_results = pickle.load(f)
+else:
+    dict_results = {}
+
+
+
+dict_results[date] = {'name_frac_file':name_frac_file, 'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}
+
+
+
+
+
+
+
+
+ee = input('Are you sure you want to erase last results ?(y/n)')
+if ee=='y':
+    with open(file_dict_results, 'wb') as handle:
+        pickle.dump(dict_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+else:
+    pass
 
 # %%

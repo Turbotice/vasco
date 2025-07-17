@@ -1,7 +1,6 @@
 #%% import libraries
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
 import h5py
 import matplotlib
 #import fitutils as fu
@@ -10,6 +9,7 @@ import os
 import pickle
 import csv
 import re
+import sys
 from scipy.signal import savgol_filter
 from scipy.optimize import curve_fit
 from scipy.interpolate import LinearNDInterpolator
@@ -23,20 +23,20 @@ from scipy.interpolate import LinearNDInterpolator
 # %% load data
 W = 64
 #Dt = 1 # pour ce cas pas de Dt car on compare tout par rapport à une même image de reference
-i0 = 0
+i0 = 9
 N = 0
-refimg = 0
+refimg = 9
 
-date = '0512'
-name_frac_file = 'img_seq2'
+date = '0526'
+name_frac_file = 'img_seq_6'
 #camera_SN = '22458101'
 
 #f_exc = 0.94
 freq_acq = 20
 
-frame_frac = 2572
+frame_frac = 1329
 #computer = 'adour'
-ypix_surf = 490
+ypix_surf = 332
 
 system_loc = 'windows_server'
 
@@ -84,10 +84,9 @@ ypix = mat_dict['y'][0][0][:,0]
 
 
 
-
 #%%
 
-yind = 3 # il vaut mieux utiliser les coordonnées en pixels
+yind = 4 # il vaut mieux utiliser les coordonnées en pixels
 
 frame_plot = frame_frac - 5
 
@@ -98,7 +97,7 @@ plt.show()
 
 
 plt.figure()
-plt.title('frame frac = '+str(frame_frac))
+plt.title('profile : '+str(yind)+' , frame frac = '+str(frame_frac))
 for i in range(frame_plot-i0,frame_plot+10-i0): # fenetre temporelle où il y a la fracture
     plt.plot(v[i,yind,:],label=str(i+i0))
 plt.legend()
@@ -107,18 +106,18 @@ plt.show()
 
 # %% courbure de la plaque juste avant la fracture ?
 
-dcm_sur_dpx = 0.07
-dcm_sur_dpx_err = 0.005
-
-xvals = np.arange(v.shape[2]) * dcm_sur_dpx * W/2 * 1e-2
-v_converted_meters = v * dcm_sur_dpx * 1e-2
+xvals = np.arange(v.shape[2]) * 0.075 * W/2 * 1e-2
+v_converted_meters = v * 0.075 * 1e-2
 
 # 0.075 est la valeur approximative de dcm/dpx, mais une utilisation de la variation de dcm/dpx 
 # est requise pour une meilleure estimation de kappa_c
 
 
-ind_inf_fit = 20
-ind_sup_fit = 40
+ind_inf_fit = 35
+ind_sup_fit = 45
+
+
+
 print(xvals)
 fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
 print(fit_params)
@@ -131,6 +130,8 @@ plt.legend()
 plt.show()
 
 kappa_c = 2*fit_params[0]
+
+
 
 #%%load file echelles fracture pour avoir en x et y les variations de dpx/dcm
 #if computer=='Leyre':
@@ -224,6 +225,8 @@ for j in range(len(ypix)):
         except:
             DCM_SUR_DPX_2[j,i] = np.nan
 
+DCM_SUR_DPX_2 = np.tile(np.reshape(np.nanmean(DCM_SUR_DPX_2,axis=1),(v.shape[1],1)),(1,v.shape[2]))
+
 plt.figure()
 plt.imshow(DCM_SUR_DPX_2)
 plt.colorbar()
@@ -292,16 +295,33 @@ v_angle_corrected = v_converted_meters/np.cos(ArrAlph)
 
 kappa_c_vals = []
 
-yindices = np.array([3,4,5])
+yindices = np.array([4])
 
-ind_inf_fit = 20
-ind_sup_fit = 42
+ind_inf_fit = 28
+ind_sup_fit = 44
+
+
+
+bounds_indices2remove = (32,35) # upper bound included
+remove_indices = True
+
+xvals_cut = np.hstack((xvals[ind_inf_fit:bounds_indices2remove[0]],xvals[bounds_indices2remove[1]+1:ind_sup_fit]))
+
+#print(xvals)
+#fit_params = np.polyfit(xvals_cut,vvals_cut,2)
+
 xvals_fit = xvals[ind_inf_fit:ind_sup_fit]
+
+
 
 plt.figure()
 for yind in yindices:
     #print(xvals)
-    fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_angle_corrected[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
+    vvals_cut = np.hstack((v_angle_corrected[frame_frac-i0,yind,ind_inf_fit:bounds_indices2remove[0]],v_angle_corrected[frame_frac-i0,yind,bounds_indices2remove[1]+1:ind_sup_fit]))
+    if remove_indices:
+        fit_params = np.polyfit(xvals_cut,vvals_cut,2)
+    else:
+        fit_params = np.polyfit(xvals_fit, v_angle_corrected[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
     #print(fit_params)
 #    fit_params_2 = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
 #    plt.figure()
@@ -309,6 +329,7 @@ for yind in yindices:
 #    plt.plot(xvals,v_converted_meters[frame_frac-i0,yind,:],label='yind='+str(yind))
     plt.plot(xvals,v_angle_corrected[frame_frac-i0,yind,:],label='yind='+str(yind))
     plt.plot(xvals_fit,fit_params[0]*xvals_fit**2+fit_params[1]*xvals_fit+fit_params[2],label='fit',color='red',alpha=0.5)
+    plt.plot(xvals_cut,vvals_cut,'o')
     plt.plot()
     plt.legend()
 #    plt.show()
@@ -350,5 +371,6 @@ if ee=='y':
         pickle.dump(dict_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 else:
     pass
+
 
 # %%
