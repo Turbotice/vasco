@@ -232,18 +232,18 @@ plt.show()
 DcmSurDpx_3dim = np.tile(DCM_SUR_DPX_2,(u.shape[0],1,1))
 
 v_cm = DcmSurDpx_3dim * v
+v_converted_meters = v_cm * 1e-2
 
 
 
 xvals_px = np.arange(v.shape[2]) * W/2
-xvals =  xvals_px * DCM_SUR_DPX_2[yind,:] * 1e-2
-v_converted_meters = v_cm * 1e-2
+xvals_test =  xvals_px * DCM_SUR_DPX_2[yind,:] * 1e-2
 v_converted_meters_1 = v * 0.07 * 1e-2
 
 
 plt.figure()
 #plt.plot(xvals,v[frame_frac-i0,yind,:]*0.075,label='frame '+str(frame_frac))
-plt.plot(xvals,v_cm[frame_frac-i0,yind,:],label='frame '+str(frame_frac))
+plt.plot(xvals_test,v_cm[frame_frac-i0,yind,:],label='frame '+str(frame_frac))
 
 plt.show()
 
@@ -292,15 +292,16 @@ v_angle_corrected = v_converted_meters/np.cos(ArrAlph)
 
 kappa_c_vals = []
 
-yindices = np.array([3,4,5])
+yindices = np.array([3,4,5,6])
 
 ind_inf_fit = 20
 ind_sup_fit = 42
-xvals_fit = xvals[ind_inf_fit:ind_sup_fit]
 
 plt.figure()
 for yind in yindices:
     #print(xvals)
+    xvals =  xvals_px * DCM_SUR_DPX_2[yind,:] * 1e-2
+    xvals_fit = xvals[ind_inf_fit:ind_sup_fit]
     fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_angle_corrected[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
     #print(fit_params)
 #    fit_params_2 = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
@@ -335,9 +336,10 @@ else:
 
 
 
-dict_results[date] = {'name_frac_file':name_frac_file, 'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}
-
-
+if date in dict_results:
+    dict_results[date][name_frac_file] = {'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}
+else:
+    dict_results[date] = {name_frac_file: {'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}}
 
 
 

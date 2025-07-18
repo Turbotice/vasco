@@ -33,6 +33,7 @@ name_frac_file = 'img_seq3'
 #f_exc = 0.94
 freq_acq = 20
 
+frame_frac = 4603
 #computer = 'adour'
 
 system_loc = 'windows_server'

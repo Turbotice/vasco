@@ -301,8 +301,8 @@ plt.title('norme vitesse * signe(Vy) en px/sec pour differentes position en x')
 for j in [30,37,50]:
     vx = Vx[0:450,9,j]
     vy = Vy[0:450,9,j]
-    v = np.sqrt(vx**2+vy**2)
-    plt.plot(v*np.sign(vy))
+    vnorm = np.sqrt(vx**2+vy**2)
+    plt.plot(vnorm*np.sign(vy))
 plt.ylim(-70,70)
 plt.show()
 
@@ -341,8 +341,8 @@ for i in range(tinit2plot,tinit2plot+30,1):
 
     vx = Vx[i,yind,:]
     vy = Vy[i,yind,:]
-    v = np.sqrt(vx**2+vy**2)
-    plt.plot(np.arange(len(v))*(W/2) * compute_aspect_ratio(xpix[xind],ypix[yind]),v*np.sign(vy))
+    vnorm = np.sqrt(vx**2+vy**2)
+    plt.plot(np.arange(len(vnorm))*(W/2) * compute_aspect_ratio(xpix[xind],ypix[yind]),v*np.sign(vy))
 #plt.xlim(42,120)
 plt.xlabel('x (cm)')
 plt.ylabel('V * sign(Vy) (px/sec)')

@@ -9,6 +9,7 @@ import os
 import pickle
 import csv
 import re
+import sys
 from scipy.signal import savgol_filter
 from scipy.optimize import curve_fit
 from scipy.interpolate import LinearNDInterpolator
@@ -99,23 +100,21 @@ def matcell2dict_PIV(matcell,dim_keys = 0):
 
 # %% load data
 W = 64
-#Dt = 1 # pour ce cas pas de Dt car on compare tout par rapport à une même image de reference
-i0 = 24
+Dt = 1
+i0 = 0
 N = 0
-refimg = 24
 
 date = '0506'
-name_frac_file = 'image_sequence'
+acq_num = 4
+camera_SN = '22458101'
 
-#camera_SN = '22458101'
-
-#f_exc = 0.94
+f_exc = 0.94
 freq_acq = 20
 
-frame_frac = 698
-
-ypix_surf = 400
+frame_frac = 699
+frame_Vy_max = 695
 #computer = 'adour'
+ypix_surf = 400
 
 system_loc = 'windows_server'
 
@@ -127,55 +126,72 @@ system_loc = 'windows_server'
 if system_loc=='linux_server':
     general_folder = f'/media/turbots/GreDisk/Gre25/Data/{date}/cameras/frac/image_sequence/'
 elif system_loc=='windows_server':
-    general_folder = f'R:/Gre25/Data/PIV_results/{date}_frac_image_sequence/'
+    general_folder = f'R:/Gre25/Data/{date}/cameras/frac/image_sequence/'
 
 
-path2data = general_folder
-
-matfile = f'{path2data}PIV_processed_3passages_i0{i0}_N{N}_W{W}_refimg{refimg}.mat'
-
-#matfile = f'{path2data}PIV_processed_i0{i0}_N{N}_W{W}_refimg{refimg}.mat'
+path2data = f'{general_folder}/{f_exc}Hz_{freq_acq}Hz/matData/'
+matfile = f'{path2data}PIV_processed_i0{i0}_N{N}_Dt{Dt}_b1_W{W}_full_total_processed.mat'
 
 
-from scipy.io import loadmat
+#general_folder = f'R:/Gre25/{date}/cameras/frac/img_seq_3/'
 
-mat_dict = loadmat(matfile)
+#general_folder = f'R:/Gre25/{date}/cameras/frac/image_sequence/'
 
+path2data = general_folder + 'matData/'
+matfile = f'{path2data}PIV_processed_i0{i0}_N{N}_Dt{Dt}_b1_W{W}_full_total_processed.mat'
 
-u_original = mat_dict['u_original'][:,0]
-v_original = mat_dict['v_original'][:,0]
+with h5py.File(matfile, 'r') as fmat:
+    mat_dict = {}
+    
+    print('Top-level keys : ', list(fmat.keys()))
 
-def reshape_array(arr):
-    array_new = np.zeros((len(arr),arr[0].shape[0],arr[0].shape[1]))
-    for i in range(len(arr)):
-        array_new[i,:,:] = arr[i]
-    return array_new
-
-u = reshape_array(u_original)
-v = reshape_array(v_original)
-
-u = -u
-v = -v
-
-xpix = mat_dict['x'][0][0][0]
-ypix = mat_dict['y'][0][0][:,0]
-
-
-
-
+    mat_dict = mat_to_dict(fmat['m'],fmat['m'])
 # %% visualize piv data
-yind = 4 # il vaut mieux utiliser les coordonnées en pixels
+ymin = 100
+ymax = 400 # bords de l'eau sur images
+
+t_plot = 408 - i0 # numero de frame par rapport à la premiere frame considerée dans la piv (i0)
+
+Vy = mat_dict['Vy']
+Vx = mat_dict['Vx']
+xpix = mat_dict['xpix']
+ypix = mat_dict['ypix']
+
+
+
+
+Vx = mat_dict['Vx']
+Vy = mat_dict['Vy']
+
+u = -Vx * (1/freq_acq)
+v = -Vy * (1/freq_acq)
+
+
+xpix = mat_dict['xpix']
+ypix = mat_dict['ypix']
+
+
+y_indices = np.where((ypix>ymin)&(ypix<ymax))[0]
+
+Vx_converted_px = Vx/freq_acq
+Vy_converted_px = Vy/freq_acq
+
+
 
 plt.figure()
-plt.title('elevation map (px) at frame 10')
-plt.imshow(v[10],vmin=-3,vmax=3)
-plt.colorbar()
+plt.imshow(Vy_converted_px[t_plot,y_indices,:],extent=[np.min(xpix),np.max(xpix),np.max(ypix[y_indices]),np.min(ypix[y_indices])],vmin=-np.max(Vy_converted_px)/5,vmax=np.max(Vy_converted_px)/5)
 plt.show()
 
-
 plt.figure()
-plt.title('profile at yind='+str(yind)+' for the first frames')
-for i in range(40):
+plt.imshow(Vy[t_plot,y_indices,:])
+plt.show()
+
+#%%
+
+yind = 6
+plt.figure()
+plt.title('profile at yind='+str(yind)+' when fracture occurs')
+for i in range(frame_frac - 10, frame_frac+2):
     plt.plot(v[i,yind,:],label=str(i))
 plt.legend()
 plt.show()
@@ -183,105 +199,6 @@ plt.show()
 
 
 
-frame_plot = frame_frac - 5
-
-plt.figure()
-plt.title('elevation map (px) at frame '+str(frame_plot))
-plt.imshow(v[frame_plot-i0],vmin=-5,vmax=5)
-plt.colorbar()
-plt.show()
-
-
-plt.figure()
-plt.title('profile : '+str(yind)+' , frame frac = '+str(frame_frac))
-for i in range(frame_plot-i0,frame_plot+10-i0): # fenetre temporelle où il y a la fracture
-    plt.plot(v[i,yind,:],label=str(i+i0))
-plt.legend()
-plt.show()
-
-
-#%% partie pour trouver image de reference
-
-xind_min = 11
-xind_max = 48
-tind_min = 0
-tind_max = 20
-
-
-tind_profile_max = np.argmax(np.sum(v[tind_min:tind_max,yind,xind_min:xind_max],axis=1))
-tind_profile_min = np.argmin(np.sum(v[tind_min:tind_max,yind,xind_min:xind_max],axis=1))
-
-# on en déduit, comme c'est périodique :
-tind_profile_centre = np.round((tind_profile_min+tind_profile_max)/2).astype(int)
-u_field_centre = u[tind_profile_centre,:,:]
-v_field_centre = v[tind_profile_centre,:,:]
-
-plt.figure()
-
-plt.plot(v[tind_profile_min,yind,:],label=str(tind_profile_min))
-plt.plot(v[tind_profile_max,yind,:],label=str(tind_profile_max))
-plt.plot(v[tind_profile_centre,yind,:],label=str(tind_profile_centre))
-
-plt.legend()
-plt.show()
-
-
-u_shifted = u - np.tile(u_field_centre,(u.shape[0],1,1))
-v_shifted = v - np.tile(v_field_centre,(v.shape[0],1,1))
-
-plt.figure()
-plt.title('profile (shifted) at yind='+str(yind)+' for the first frames')
-for i in range(100,140):
-    plt.plot(v_shifted[i,yind,:],label=str(i))
-plt.legend()
-plt.show()
-
-# à faire dans un second temps : utiliser v_shifted à la place de v et moyenner les les v_field_centre pour ameliorer correction
-
-# %% courbure de la plaque juste avant la fracture ?
-
-xvals = np.arange(v.shape[2]) * 0.075 * W/2 * 1e-2
-v_converted_meters = v * 0.075 * 1e-2
-
-
-# 0.075 est la valeur approximative de dcm/dpx, mais une utilisation de la variation de dcm/dpx 
-# est requise pour une meilleure estimation de kappa_c
-
-
-ind_inf_fit = 20
-ind_sup_fit = 42
-print(xvals)
-fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
-print(fit_params)
-
-plt.figure()
-plt.title('profile at yind='+str(yind))
-plt.plot(xvals,v_converted_meters[frame_frac-i0,yind,:],label='frame '+str(frame_frac))
-plt.plot(xvals[ind_inf_fit:ind_sup_fit],(fit_params[0]*xvals**2 + fit_params[1]*xvals + fit_params[2])[ind_inf_fit:ind_sup_fit],label='fit : $\kappa$ = '+str(np.round(2*fit_params[0],3)))
-plt.legend()
-plt.show()
-
-kappa_c = 2*fit_params[0]
-
-
-
-
-#%% calcul echelles avec photos regle
-"""
-tab_dcm = np.array([23,30,30])
-tab_dpx = np.array([259,384,497])
-
-delta_y = 1100-200 # car photos regles pas memes dimensions que photos fracture...
-tab_y = np.array([1100,1185,1350]) - delta_y
-plt.figure()
-plt.plot(tab_y,tab_dcm/tab_dpx,'o')
-popt,pcov = curve_fit(lambda x,a,b:a*x + b,tab_y,tab_dcm/tab_dpx)
-plt.plot(tab_y,popt[0]*tab_y+popt[1])
-plt.show()
-
-def compute_aspect_ratio(y,popt=popt):
-    return popt[0]*y+popt[1]
-"""
 #%%load file echelles fracture pour avoir en x et y les variations de dpx/dcm
 #if computer=='Leyre':
 #    file_echelles_fracture = '/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/20241129/echelles/echelles_fracture.txt'
@@ -305,7 +222,6 @@ d['xmoy'] = data_ech_frac[:,0]
 d['ymoy'] = data_ech_frac[:,1]
 d['dcm'] = data_ech_frac[:,2]
 d['dpx'] = data_ech_frac[:,3]
-d['ypix_surf'] = data_ech_frac[:,4]
 #d['delta_y'] = data_ech_frac[:,5]
 
 d['tab_ymoy_refmanip'] = d['ymoy']# - d['delta_y']
@@ -334,28 +250,19 @@ plt.ylabel('ymoy')
 plt.xlim(np.min(x)-50,np.max(x)+50)
 plt.show()
 
-def linfitinterp(x,d=d,plot=False):
-    interp_function = d['interp_function']
-    tab_y = np.linspace(np.min(d['tab_ymoy_refmanip']), np.max(d['tab_ymoy_refmanip']))
-    X,Y = np.meshgrid(x,tab_y)
-    Z = interp_function(X,Y)
-    if np.sum(np.isnan(Z)==False)==0:
-        return np.zeros(2)*np.nan,np.zeros((2,2))*np.nan
-    popt,pcov = curve_fit(lambda x,a,b:a*x + b,Y[np.isnan(Z)==False],Z[np.isnan(Z)==False])
-    if plot:
-        plt.figure()
-        plt.plot(Y.flatten(),Z.flatten(),'o')
-        plt.plot(Y.flatten(),popt[0]*Y.flatten()+popt[1])
-        plt.show()
-    return popt,pcov
-
-
-def compute_aspect_ratio(x,y,d=d,plot=False):
-    popt,_ = linfitinterp(x,d=d,plot=plot)
-    dcm_sur_dpx = popt[0]*y+popt[1]
-    return dcm_sur_dpx    
 
 #%% calcul de tab_dcmsurdpx pour toutes les positions de cases piv (x,y) (avec x et y en pixels)
+
+if len(xpix)!=v.shape[2]:
+    xpix = xpix[:-(len(xpix)-v.shape[2])]
+else:
+    pass
+
+if len(ypix)!=v.shape[2]:
+    ypix = ypix[:-(len(ypix)-v.shape[1])]
+else:
+    pass
+
 
 XPIX,YPIX = np.meshgrid(xpix,ypix)
 
@@ -381,43 +288,30 @@ plt.show()
 DcmSurDpx_3dim = np.tile(DCM_SUR_DPX_2,(u.shape[0],1,1))
 
 v_cm = DcmSurDpx_3dim * v
+v_converted_meters = v_cm * 1e-2
 
+v_converted_meters = v_converted_meters * freq_acq # meters per sec
+
+xvals_px = np.arange(v.shape[2]) * W/2
+
+xvals_test =  xvals_px * DCM_SUR_DPX_2[yind,:] * 1e-2
+#v_converted_meters_1 = v * 0.07 * 1e-2
+
+#%%
 plt.figure()
-plt.plot(xvals,v[frame_frac-i0,yind,:]*0.075,label='frame '+str(frame_frac))
-plt.plot(xvals,v_cm[frame_frac-i0,yind,:],label='frame '+str(frame_frac))
+#plt.plot(xvals,v[frame_frac-i0,yind,:]*0.075,label='frame '+str(frame_frac))
+plt.plot(xvals_test,v_cm[frame_Vy_max-i0,yind,:],label='frame '+str(frame_frac))
 
 plt.show()
 
-
-
-
-xvals = np.arange(v.shape[2]) * 0.075 * W/2 * 1e-2
-v_converted_meters = v_cm * 1e-2
-
-#%% hidden cell
-'''
-for yind in [3,4,5,6,7]:
-    print(xvals)
-    fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
-    print(fit_params)
-
-    plt.figure()
-    plt.title('profile at yind='+str(yind))
-    plt.plot(xvals,v_converted_meters[frame_frac-i0,yind,:],label='frame '+str(frame_frac))
-    plt.plot(xvals[ind_inf_fit:ind_sup_fit],(fit_params[0]*xvals**2 + fit_params[1]*xvals + fit_params[2])[ind_inf_fit:ind_sup_fit],label='fit : $\kappa$ = '+str(np.round(2*fit_params[0],3)))
-    plt.legend()
-    plt.show()
-
-    kappa_c = 2*fit_params[0]
-    print(kappa_c)
-'''
 # %% affichage de differents profils avec correction angulaire vs y 
 # et variation echelle horizontale vs y
-
 
 sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/vasco/cold_room/post_traitement/piv_grenoble/fracture/python_functions/')
 
 from spatial_scale import *
+
+
 
 array_alphas = np.zeros(len(ypix))
 
@@ -429,66 +323,43 @@ ArrAlph = np.tile(array_alphas, (v.shape[0],1,v.shape[2]))
 #print(ArrAlph[0,:,0])
 v_angle_corrected = v_converted_meters/np.cos(ArrAlph)
 
+kappa_c_velocity_vals = []
 
-ind_inf_fit = 22
-ind_sup_fit = 40
+yindices = np.array([6,8])
 
-xvals_fit = xvals[ind_inf_fit:ind_sup_fit]
-
-kappa_c_vals = []
-
-yindices = np.array([3,4,5,6])
+ind_inf_fit = 24
+ind_sup_fit = 35
 
 plt.figure()
 for yind in yindices:
     #print(xvals)
-    fit_params = np.polyfit(xvals_fit,v_angle_corrected[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
+    xvals =  xvals_px * DCM_SUR_DPX_2[yind,:] * 1e-2
+    xvals_fit = xvals[ind_inf_fit:ind_sup_fit]
+    fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_angle_corrected[frame_Vy_max-i0,yind,ind_inf_fit:ind_sup_fit],2)
     #print(fit_params)
 #    fit_params_2 = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
 #    plt.figure()
-    plt.title('profiles at frame '+str(frame_frac))
+    plt.title('profiles at frame '+str(frame_Vy_max))
 #    plt.plot(xvals,v_converted_meters[frame_frac-i0,yind,:],label='yind='+str(yind))
-    plt.plot(xvals,v_angle_corrected[frame_frac-i0,yind,:],'.',label='yind='+str(yind))
-    plt.plot(xvals_fit,fit_params[0]*xvals_fit**2+fit_params[1]*xvals_fit+fit_params[2],label='fit',color='red')
+    plt.plot(xvals,v_angle_corrected[frame_Vy_max-i0,yind,:],label='yind='+str(yind))
+    plt.plot(xvals_fit,fit_params[0]*xvals_fit**2+fit_params[1]*xvals_fit+fit_params[2],label='fit',color='red',alpha=0.5)
     plt.plot()
     plt.legend()
 #    plt.show()
 
-    kappa_c = 2*fit_params[0]
-    print('kappac',kappa_c)
-    kappa_c_vals.append(kappa_c)
+    kappa_c_velocity = 2*fit_params[0]
+    print('max curvature of velocity :',kappa_c_velocity)
+    kappa_c_velocity_vals.append(kappa_c_velocity)
 
 plt.show()
-
-print(np.mean(np.array(kappa_c_vals)))
-print(np.std(np.array(kappa_c_vals)))
+kappa_c_velocity_vals = np.array(kappa_c_velocity_vals)
 
 
-# %%
-file_dict_results = 'R:/Gre25/Summary/fracture_postprocessing/resultats/fracture_results.pkl'
-
-if os.path.exists(file_dict_results):
-    with open(file_dict_results, 'rb') as f:
-        dict_results = pickle.load(f)
-else:
-    dict_results = {}
+kappa_c_vals = kappa_c_velocity_vals/(2*np.pi*f_exc)
 
 
+print("converti en courbure spatiale :")
+print("kappa_c=",kappa_c_vals)
 
-dict_results[date] = {'name_frac_file':name_frac_file, 'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}
-
-
-
-
-
-
-
-
-ee = input('Are you sure you want to erase last results ?(y/n)')
-if ee=='y':
-    with open(file_dict_results, 'wb') as handle:
-        pickle.dump(dict_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
-else:
-    pass
 
 # %%
