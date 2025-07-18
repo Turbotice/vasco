@@ -105,7 +105,7 @@ i0 = 0
 N = 0
 
 date = '0506'
-acq_num = 4
+
 camera_SN = '22458101'
 
 f_exc = 0.94

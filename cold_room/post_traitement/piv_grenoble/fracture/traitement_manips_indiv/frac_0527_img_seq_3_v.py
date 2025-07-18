@@ -17,25 +17,26 @@ from scipy.interpolate import LinearNDInterpolator
 # %%
 #%matplotlib widget
 %matplotlib qt
+#%%
 
 
 # %% load data
 W = 32
 #Dt = 1 # pour ce cas pas de Dt car on compare tout par rapport à une même image de reference
 i0 = 0
-N = 0
-refimg = 0
+N = 3700
+Dt = 1
 
-date = '0523'
-name_frac_file = 'img_seq1'
+date = '0527'
+name_frac_file = 'img_seq_3'
 #camera_SN = '22458101'
 
-#f_exc = 0.94
-freq_acq = 20
+f_exc = 2.0
+freq_acq = 30
 
-frame_frac = 1783
+frame_frac = 2881 # on sait pas exactement
 #computer = 'adour'
-ypix_surf = 380
+ypix_surf = 390
 
 system_loc = 'windows_server'
 
@@ -52,7 +53,7 @@ elif system_loc=='windows_server':
 
 path2data = general_folder
 
-matfile = f'{path2data}PIV_processed_4passages_i0{i0}_N{N}_W{W}_refimg{refimg}.mat'
+matfile = f'{path2data}PIV_processed_4passages_i0{i0}_N{N}_W{W}_Dt{Dt}.mat'
 
 #matfile = f'{path2data}PIV_processed_i0{i0}_N{N}_W{W}_refimg{refimg}.mat'
 
@@ -86,7 +87,7 @@ ypix = mat_dict['y'][0][0][:,0]
 
 #%%
 
-yind =13 # il vaut mieux utiliser les coordonnées en pixels
+yind = 6 # il vaut mieux utiliser les coordonnées en pixels
 
 frame_plot = frame_frac - 5
 
@@ -116,8 +117,8 @@ v_converted_meters = v * dcm_sur_dpx * 1e-2
 # est requise pour une meilleure estimation de kappa_c
 
 
-ind_inf_fit = 29
-ind_sup_fit = 80
+ind_inf_fit = 20
+ind_sup_fit = 40
 print(xvals)
 fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
 print(fit_params)
@@ -223,9 +224,6 @@ for j in range(len(ypix)):
         except:
             DCM_SUR_DPX_2[j,i] = np.nan
 
-
-
-
 plt.figure()
 plt.imshow(DCM_SUR_DPX_2)
 plt.colorbar()
@@ -233,15 +231,15 @@ plt.show()
 
 DcmSurDpx_3dim = np.tile(DCM_SUR_DPX_2,(u.shape[0],1,1))
 
-#DcmSurDpx_3dim = np.tile(np.reshape(np.nanmean(DCM_SUR_DPX_2,axis=1),(u.shape[1],1)),(u.shape[0],1,u.shape[2]))
-
 v_cm = DcmSurDpx_3dim * v
+v_converted_meters = v_cm * 1e-2
 
-
+##########################################################
+v_converted_meters = v_converted_meters * freq_acq # pour convertir en vitesse (m/s)
+##########################################################
 
 xvals_px = np.arange(v.shape[2]) * W/2
 xvals_test =  xvals_px * DCM_SUR_DPX_2[yind,:] * 1e-2
-v_converted_meters = v_cm * 1e-2
 v_converted_meters_1 = v * 0.07 * 1e-2
 
 
@@ -250,6 +248,7 @@ plt.figure()
 plt.plot(xvals_test,v_cm[frame_frac-i0,yind,:],label='frame '+str(frame_frac))
 
 plt.show()
+
 
 # %% affichage de differents profils avec correction angulaire vs y 
 # et variation echelle horizontale vs y
@@ -268,34 +267,19 @@ ArrAlph = np.tile(array_alphas, (v.shape[0],1,v.shape[2]))
 #print(ArrAlph[0,:,0])
 v_angle_corrected = v_converted_meters/np.cos(ArrAlph)
 
-kappa_c_vals = []
+kappa_c_v_vals = []
 
-yindices = np.array([6,7,11])
-yindices = np.array([10])
+yindices = np.array([6])
 
-#ind_inf_fit = 20
-#ind_sup_fit = 42
-
-ind_inf_fit = 30
-ind_sup_fit = 80
-
-bounds_indices2remove = (20,55) # upper bound included
-remove_indices = False
-
-
+ind_inf_fit = 33
+ind_sup_fit = 44
 
 plt.figure()
 for yind in yindices:
     #print(xvals)
     xvals =  xvals_px * DCM_SUR_DPX_2[yind,:] * 1e-2
     xvals_fit = xvals[ind_inf_fit:ind_sup_fit]
-    xvals_cut = np.hstack((xvals[ind_inf_fit:bounds_indices2remove[0]],xvals[bounds_indices2remove[1]+1:ind_sup_fit]))
-    vvals_cut = np.hstack((v_angle_corrected[frame_frac-i0,yind,ind_inf_fit:bounds_indices2remove[0]],v_angle_corrected[frame_frac-i0,yind,bounds_indices2remove[1]+1:ind_sup_fit]))
-    if remove_indices:
-        fit_params = np.polyfit(xvals_cut,vvals_cut,2)
-    else:
-        fit_params = np.polyfit(xvals_fit, v_angle_corrected[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
-    
+    fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_angle_corrected[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
     #print(fit_params)
 #    fit_params_2 = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
 #    plt.figure()
@@ -303,20 +287,25 @@ for yind in yindices:
 #    plt.plot(xvals,v_converted_meters[frame_frac-i0,yind,:],label='yind='+str(yind))
     plt.plot(xvals,v_angle_corrected[frame_frac-i0,yind,:],label='yind='+str(yind))
     plt.plot(xvals_fit,fit_params[0]*xvals_fit**2+fit_params[1]*xvals_fit+fit_params[2],label='fit',color='red',alpha=0.5)
-    plt.plot(xvals_cut,vvals_cut,'.')
     plt.plot()
     plt.legend()
 #    plt.show()
 
-    kappa_c = 2*fit_params[0]
-    print('kappac',kappa_c)
-    kappa_c_vals.append(kappa_c)
+    kappa_c_v = 2*fit_params[0]
+    print('kappac_v',kappa_c_v)
+    kappa_c_v_vals.append(kappa_c_v)
 
 plt.show()
 
+print(np.mean(np.array(kappa_c_v_vals)))
+print(np.std(np.array(kappa_c_v_vals)))
+
+kappa_c_v_vals = np.array(kappa_c_v_vals)
+
+# On en déduit la courbure (spatiale, en m^-1) critique à partir de la courbure critique pour la vitesse
+kappa_c_vals = kappa_c_v_vals/(2*np.pi*f_exc)
 print(np.mean(np.array(kappa_c_vals)))
 print(np.std(np.array(kappa_c_vals)))
-
 
 
 # %% enregistrement des données
@@ -329,12 +318,11 @@ else:
     dict_results = {}
 
 
+
 if date in dict_results:
-    dict_results[date][name_frac_file] = {'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}
+    dict_results[date][name_frac_file] = {'kappa_c_v_vals':kappa_c_v_vals,'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}
 else:
-    dict_results[date] = {name_frac_file: {'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}}
-
-
+    dict_results[date] = {name_frac_file: {'kappa_c_v_vals':kappa_c_v_vals, 'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}}
 
 
 
