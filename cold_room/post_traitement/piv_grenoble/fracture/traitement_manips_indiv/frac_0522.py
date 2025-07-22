@@ -36,7 +36,7 @@ date = '0522'
 name_frac_file = 'recherche_freq_puis_frac'
 #camera_SN = '22458101'
 
-#f_exc = 0.94
+#f_exc = 
 freq_acq = 20
 
 frame_frac = 9276

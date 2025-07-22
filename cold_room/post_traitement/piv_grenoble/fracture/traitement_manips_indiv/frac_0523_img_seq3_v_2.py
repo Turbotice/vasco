@@ -326,9 +326,9 @@ else:
 
 
 if date in dict_results:
-    dict_results[date][name_frac_file] = {'kappa_c_v_vals':kappa_c_v_vals,'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}
+    dict_results[date][name_frac_file] = {'kappa_c_v_vals':kappa_c_v_vals,'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf,'f_exc':f_exc}
 else:
-    dict_results[date] = {name_frac_file: {'kappa_c_v_vals':kappa_c_v_vals, 'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}}
+    dict_results[date] = {name_frac_file: {'kappa_c_v_vals':kappa_c_v_vals, 'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf,'f_exc':f_exc}}
 
 
 

@@ -109,7 +109,7 @@ name_frac_file = 'image_sequence'
 
 #camera_SN = '22458101'
 
-#f_exc = 0.94
+f_exc = 0.9597
 freq_acq = 20
 
 frame_frac = 698
@@ -477,9 +477,9 @@ else:
 
 
 if date in dict_results:
-    dict_results[date][name_frac_file] = {'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}
+    dict_results[date][name_frac_file] = {'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf,'f_exc':f_exc}
 else:
-    dict_results[date] = {name_frac_file: {'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}}
+    dict_results[date] = {name_frac_file: {'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf,'f_exc':f_exc}}
 
 
 

@@ -84,7 +84,7 @@ date = '0513'
 name_frac_file = 'img_seq5'
 #camera_SN = '22458101'
 
-f_exc = 0.95
+f_exc = 0.85
 freq_acq = 20
 
 frame_frac = 3209
@@ -367,9 +367,9 @@ else:
 
 
 if date in dict_results:
-    dict_results[date][name_frac_file] = {'kappa_c_velocity_vals':kappa_c_velocity_vals,'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}
+    dict_results[date][name_frac_file] = {'kappa_c_velocity_vals':kappa_c_velocity_vals,'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf,'f_exc':f_exc}
 else:
-    dict_results[date] = {name_frac_file: {'kappa_c_velocity_vals':kappa_c_velocity_vals,'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf}}
+    dict_results[date] = {name_frac_file: {'kappa_c_velocity_vals':kappa_c_velocity_vals,'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf,'f_exc':f_exc}}
 
 
 
