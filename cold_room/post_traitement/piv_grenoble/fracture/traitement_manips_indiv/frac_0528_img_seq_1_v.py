@@ -24,19 +24,20 @@ from scipy.interpolate import LinearNDInterpolator
 W = 32
 #Dt = 1 # pour ce cas pas de Dt car on compare tout par rapport à une même image de reference
 i0 = 0
-N = 3700
+N = 0
 Dt = 1
 
-date = '0527'
-name_frac_file = 'img_seq_3'
+date = '0528'
+name_frac_file = 'img_seq_1'
 #camera_SN = '22458101'
 
-f_exc = 2.0
-freq_acq = 30
+f_exc = 1.82
+freq_acq = 20
 
-frame_frac = 2881 # on sait pas exactement
+frame_frac = 159 # on sait pas exactement
+frame_Vy_max = 157
 #computer = 'adour'
-ypix_surf = 390
+ypix_surf = 408
 
 system_loc = 'windows_server'
 
@@ -85,9 +86,8 @@ ypix = mat_dict['y'][0][0][:,0]
 
 
 
-#%%
-
-yind = 6 # il vaut mieux utiliser les coordonnées en pixels
+# %%
+yind = 10 # il vaut mieux utiliser les coordonnées en pixels
 
 frame_plot = frame_frac - 5
 
@@ -104,34 +104,7 @@ for i in range(frame_plot-i0,frame_plot+10-i0): # fenetre temporelle où il y a 
 plt.legend()
 plt.show()
 
-
-# %% courbure de la plaque juste avant la fracture ?
-
-dcm_sur_dpx = 0.07
-dcm_sur_dpx_err = 0.005
-
-xvals = np.arange(v.shape[2]) * dcm_sur_dpx * W/2 * 1e-2
-v_converted_meters = v * dcm_sur_dpx * 1e-2
-
-# 0.075 est la valeur approximative de dcm/dpx, mais une utilisation de la variation de dcm/dpx 
-# est requise pour une meilleure estimation de kappa_c
-
-
-ind_inf_fit = 20
-ind_sup_fit = 40
-print(xvals)
-fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
-print(fit_params)
-
-plt.figure()
-plt.title('profile at yind='+str(yind))
-plt.plot(xvals,v_converted_meters[frame_frac-i0,yind,:],label='frame '+str(frame_frac))
-plt.plot(xvals[ind_inf_fit:ind_sup_fit],(fit_params[0]*xvals**2 + fit_params[1]*xvals + fit_params[2])[ind_inf_fit:ind_sup_fit],label='fit : $\kappa$ = '+str(np.round(2*fit_params[0],3)))
-plt.legend()
-plt.show()
-
-kappa_c = 2*fit_params[0]
-
+# %%
 #%%load file echelles fracture pour avoir en x et y les variations de dpx/dcm
 #if computer=='Leyre':
 #    file_echelles_fracture = '/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/20241129/echelles/echelles_fracture.txt'
@@ -224,6 +197,7 @@ for j in range(len(ypix)):
         except:
             DCM_SUR_DPX_2[j,i] = np.nan
 
+
 DCM_SUR_DPX_2_avg = np.zeros(DCM_SUR_DPX_2.shape)
 
 for i in range(DCM_SUR_DPX_2.shape[0]):
@@ -250,11 +224,17 @@ xvals_test =  xvals_px * DCM_SUR_DPX_2[yind,:] * 1e-2
 v_converted_meters_1 = v * 0.07 * 1e-2
 
 
+
+
+
+
 plt.figure()
 #plt.plot(xvals,v[frame_frac-i0,yind,:]*0.075,label='frame '+str(frame_frac))
 plt.plot(xvals_test,v_cm[frame_frac-i0,yind,:],label='frame '+str(frame_frac))
 
 plt.show()
+
+
 
 
 # %% affichage de differents profils avec correction angulaire vs y 
@@ -276,23 +256,23 @@ v_angle_corrected = v_converted_meters/np.cos(ArrAlph)
 
 kappa_c_v_vals = []
 
-yindices = np.array([6])
+yindices = np.array([10])
 
-ind_inf_fit = 33
-ind_sup_fit = 44
+ind_inf_fit = 56
+ind_sup_fit = 72
 
 plt.figure()
 for yind in yindices:
     #print(xvals)
     xvals =  xvals_px * DCM_SUR_DPX_2[yind,:] * 1e-2
     xvals_fit = xvals[ind_inf_fit:ind_sup_fit]
-    fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_angle_corrected[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
+    fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_angle_corrected[frame_Vy_max-i0,yind,ind_inf_fit:ind_sup_fit],2)
     #print(fit_params)
 #    fit_params_2 = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
 #    plt.figure()
-    plt.title('profiles at frame '+str(frame_frac))
+    plt.title('profiles at frame '+str(frame_Vy_max))
 #    plt.plot(xvals,v_converted_meters[frame_frac-i0,yind,:],label='yind='+str(yind))
-    plt.plot(xvals,v_angle_corrected[frame_frac-i0,yind,:],label='yind='+str(yind))
+    plt.plot(xvals,v_angle_corrected[frame_Vy_max-i0,yind,:],label='yind='+str(yind))
     plt.plot(xvals_fit,fit_params[0]*xvals_fit**2+fit_params[1]*xvals_fit+fit_params[2],label='fit',color='red',alpha=0.5)
     plt.plot()
     plt.legend()
@@ -342,5 +322,6 @@ if ee=='y':
         pickle.dump(dict_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 else:
     pass
+
 
 # %%

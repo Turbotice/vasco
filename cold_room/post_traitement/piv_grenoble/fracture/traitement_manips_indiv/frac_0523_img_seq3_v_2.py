@@ -17,26 +17,25 @@ from scipy.interpolate import LinearNDInterpolator
 # %%
 #%matplotlib widget
 %matplotlib qt
-#%%
 
 
 # %% load data
 W = 32
 #Dt = 1 # pour ce cas pas de Dt car on compare tout par rapport à une même image de reference
 i0 = 0
-N = 3700
+N = 0
 Dt = 1
 
-date = '0527'
-name_frac_file = 'img_seq_3'
+date = '0523'
+name_frac_file = 'img_seq3'
 #camera_SN = '22458101'
 
-f_exc = 2.0
-freq_acq = 30
+f_exc = 0.9597
+freq_acq = 20
 
-frame_frac = 2881 # on sait pas exactement
+frame_frac = 4603
 #computer = 'adour'
-ypix_surf = 390
+ypix_surf = 380
 
 system_loc = 'windows_server'
 
@@ -50,6 +49,7 @@ if system_loc=='linux_server':
 elif system_loc=='windows_server':
     general_folder = f'R:/Gre25/Data/PIV_results/{date}_frac_{name_frac_file}/'
 
+general_folder = 'C:/Users/Vasco Zanchi/Desktop/Nouveau dossier/'
 
 path2data = general_folder
 
@@ -82,14 +82,11 @@ v = -v
 xpix = mat_dict['x'][0][0][0]
 ypix = mat_dict['y'][0][0][:,0]
 
-
-
-
 #%%
 
 yind = 6 # il vaut mieux utiliser les coordonnées en pixels
 
-frame_plot = frame_frac - 5
+frame_plot = frame_frac - 10
 
 plt.figure()
 plt.imshow(v[frame_plot-i0],vmin=-5,vmax=5)
@@ -105,6 +102,7 @@ plt.legend()
 plt.show()
 
 
+
 # %% courbure de la plaque juste avant la fracture ?
 
 dcm_sur_dpx = 0.07
@@ -117,8 +115,8 @@ v_converted_meters = v * dcm_sur_dpx * 1e-2
 # est requise pour une meilleure estimation de kappa_c
 
 
-ind_inf_fit = 20
-ind_sup_fit = 40
+ind_inf_fit = 40
+ind_sup_fit = 80
 print(xvals)
 fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
 print(fit_params)
@@ -136,9 +134,9 @@ kappa_c = 2*fit_params[0]
 #if computer=='Leyre':
 #    file_echelles_fracture = '/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/20241129/echelles/echelles_fracture.txt'
 if system_loc=='windows_server':
-    file_echelles_fracture = 'R:/Gre25/Data/0523/cameras/ref_matin/echelles.txt'
+    file_echelles_fracture = 'R:/Gre25/Data/0512/cameras/ref_matin/echelles.txt'
 elif system_loc=='linux_server':
-    file_echelles_fracture = '/media/turbots/GreDisk/Gre25/Data/0523/cameras/ref_matin/echelles.txt'
+    file_echelles_fracture = '/media/turbots/GreDisk/Gre25/Data/0512/cameras/ref_matin/echelles.txt'
 data_ech_frac = np.loadtxt(file_echelles_fracture,skiprows=1,usecols=range(5))
 
 d = {}
@@ -224,6 +222,7 @@ for j in range(len(ypix)):
         except:
             DCM_SUR_DPX_2[j,i] = np.nan
 
+
 DCM_SUR_DPX_2_avg = np.zeros(DCM_SUR_DPX_2.shape)
 
 for i in range(DCM_SUR_DPX_2.shape[0]):
@@ -278,8 +277,8 @@ kappa_c_v_vals = []
 
 yindices = np.array([6])
 
-ind_inf_fit = 33
-ind_sup_fit = 44
+ind_inf_fit = 46
+ind_sup_fit = 77
 
 plt.figure()
 for yind in yindices:

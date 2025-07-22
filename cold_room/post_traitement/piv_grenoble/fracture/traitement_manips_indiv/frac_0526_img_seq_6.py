@@ -137,9 +137,9 @@ kappa_c = 2*fit_params[0]
 #if computer=='Leyre':
 #    file_echelles_fracture = '/run/user/1003/gvfs/smb-share:server=adour.local,share=hublot24/Gre24/Data/20241129/echelles/echelles_fracture.txt'
 if system_loc=='windows_server':
-    file_echelles_fracture = 'R:/Gre25/Data/0512/cameras/ref_matin/echelles.txt'
+    file_echelles_fracture = 'R:/Gre25/Data/0523/cameras/ref_matin/echelles.txt'
 elif system_loc=='linux_server':
-    file_echelles_fracture = '/media/turbots/GreDisk/Gre25/Data/0512/cameras/ref_matin/echelles.txt'
+    file_echelles_fracture = '/media/turbots/GreDisk/Gre25/Data/0523/cameras/ref_matin/echelles.txt'
 data_ech_frac = np.loadtxt(file_echelles_fracture,skiprows=1,usecols=range(5))
 
 d = {}
@@ -226,6 +226,15 @@ for j in range(len(ypix)):
             DCM_SUR_DPX_2[j,i] = np.nan
 
 DCM_SUR_DPX_2 = np.tile(np.reshape(np.nanmean(DCM_SUR_DPX_2,axis=1),(v.shape[1],1)),(1,v.shape[2]))
+
+
+DCM_SUR_DPX_2_avg = np.zeros(DCM_SUR_DPX_2.shape)
+
+for i in range(DCM_SUR_DPX_2.shape[0]):
+    DCM_SUR_DPX_2_avg[i,:] = np.nanmean(DCM_SUR_DPX_2)
+
+DCM_SUR_DPX_2 = DCM_SUR_DPX_2_avg
+
 
 plt.figure()
 plt.imshow(DCM_SUR_DPX_2)
