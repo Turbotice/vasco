@@ -52,7 +52,7 @@ def open_csv_table(file_path):
 
 # deuxieme variante de la fonction, plus adaptée au cas de la manip de grenoble
 
-def open_csv_table_experiments(file_path):
+def open_csv_table_experiments(file_path,delimiter=';'):
     # Flag to skip the first 2 rows (the first one are the caterories and the second one are the types of each column)
     skipfirst2rows = True
 
@@ -63,7 +63,7 @@ def open_csv_table_experiments(file_path):
 
     # Open and read the CSV file
     with open(file_path, 'r') as file:
-        reader = csv.reader(file,delimiter=';')
+        reader = csv.reader(file,delimiter=delimiter)
         count = 0
 
         for row in reader:
