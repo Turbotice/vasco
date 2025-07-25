@@ -18,9 +18,9 @@ from functions.disprel import *
 #%% changer generalfolder si besoin
 
 #date = '20241203'
-date = '0527'
+date = '0528'
 
-acq_num = 3
+acq_num = 4
 #camera_SN = '40300722'
 #camera_SN = '40437120'
 camera_SN = 40307970
@@ -31,7 +31,7 @@ W = 64
 Dt = 50
 direction = -1
 
-system_loc = 'linux_local'
+system_loc = 'windows_server'
 
 if system_loc=='windows_local':
     general_folder = f'D:/Gre24/Data/{date}/manip_relation_dispersion/Acquisition_{str(acq_num)}/camera_{camera_SN}/'
@@ -66,7 +66,7 @@ tab_f_exc,tab_freq_acq = list_all_freq(general_folder=general_folder)
 tab_v_phase = np.zeros(len(tab_f_exc))
 tab_v_phase_err = np.zeros(len(tab_f_exc))
 for i in range(len(tab_f_exc)):
-    tab_v_phase[i],tab_v_phase_err[i] = routine_vitesse_phase(f_exc=tab_f_exc[i],freq_acq=tab_freq_acq[i],general_folder=general_folder,W=W,Dt=Dt,direction=direction,index_profile_line=5,xlim_fit=(0,40),dcm=16,dpx=1452)#,camera_SN='40437120')#'40300722')#)
+    tab_v_phase[i],tab_v_phase_err[i] = routine_vitesse_phase(f_exc=tab_f_exc[i],freq_acq=tab_freq_acq[i],general_folder=general_folder,W=W,Dt=Dt,direction=direction,index_profile_line=3,xlim_fit=(0,50),dcm=16,dpx=1452)#,camera_SN='40437120')#'40300722')#)
 
 #%%  relation dispersion
 def v_phase_flexural(f,D):
@@ -75,8 +75,8 @@ def v_phase_flexural(f,D):
     return (D/rho)**(1/5) * omega**(3/5)
 
 
-E = 7e9
-h = 2.7e-3
+E = 1.5e9
+h = 2.4e-3
 nu = 0.4
 D = (E*h**3)/(12*(1-nu**2))
 

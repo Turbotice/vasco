@@ -34,6 +34,7 @@ f_exc = 0.9597
 freq_acq = 20
 
 frame_frac = 4603
+frame_Vy_max = 4597
 #computer = 'adour'
 ypix_surf = 380
 
@@ -277,21 +278,21 @@ kappa_c_v_vals = []
 
 yindices = np.array([6])
 
-ind_inf_fit = 46
-ind_sup_fit = 77
+ind_inf_fit = 56
+ind_sup_fit = 100
 
 plt.figure()
 for yind in yindices:
     #print(xvals)
     xvals =  xvals_px * DCM_SUR_DPX_2[yind,:] * 1e-2
     xvals_fit = xvals[ind_inf_fit:ind_sup_fit]
-    fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_angle_corrected[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
+    fit_params = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_angle_corrected[frame_Vy_max-i0,yind,ind_inf_fit:ind_sup_fit],2)
     #print(fit_params)
 #    fit_params_2 = np.polyfit(xvals[ind_inf_fit:ind_sup_fit],v_converted_meters[frame_frac-i0,yind,ind_inf_fit:ind_sup_fit],2)
 #    plt.figure()
-    plt.title('profiles at frame '+str(frame_frac))
+    plt.title('profiles at frame '+str(frame_Vy_max))
 #    plt.plot(xvals,v_converted_meters[frame_frac-i0,yind,:],label='yind='+str(yind))
-    plt.plot(xvals,v_angle_corrected[frame_frac-i0,yind,:],label='yind='+str(yind))
+    plt.plot(xvals,v_angle_corrected[frame_Vy_max-i0,yind,:],label='yind='+str(yind))
     plt.plot(xvals_fit,fit_params[0]*xvals_fit**2+fit_params[1]*xvals_fit+fit_params[2],label='fit',color='red',alpha=0.5)
     plt.plot()
     plt.legend()

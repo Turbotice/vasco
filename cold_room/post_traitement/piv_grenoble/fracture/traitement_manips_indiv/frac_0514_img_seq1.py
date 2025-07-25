@@ -21,11 +21,11 @@ from scipy.interpolate import LinearNDInterpolator
 
 
 # %% load data
-W = 64
+W = 32
 #Dt = 1 # pour ce cas pas de Dt car on compare tout par rapport à une même image de reference
 i0 = 0
 N = 5540
-refimg = 0
+Dt = 1
 
 date = '0514'
 name_frac_file = 'img_seq1'
@@ -53,7 +53,7 @@ elif system_loc=='windows_server':
 
 path2data = general_folder
 
-matfile = f'{path2data}PIV_processed_3passages_i0{i0}_N{N}_W{W}_refimg{refimg}.mat'
+matfile = f'{path2data}PIV_processed_4passages_i0{i0}_N{N}_W{W}_Dt{Dt}.mat'
 
 #matfile = f'{path2data}PIV_processed_i0{i0}_N{N}_W{W}_refimg{refimg}.mat'
 
