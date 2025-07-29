@@ -37,6 +37,7 @@ freq_acq = 15
 frame_frac = 767
 #computer = 'adour'
 ypix_surf = 480
+alpha0_deg = 17.1
 
 system_loc = 'windows_server'
 
@@ -193,7 +194,7 @@ plt.show()
 
 # %% affichage de differents profils avec correction angulaire vs y 
 # et variation echelle horizontale vs y
-
+"""
 sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/vasco/cold_room/post_traitement/piv_grenoble/fracture/python_functions/')
 
 from spatial_scale import *
@@ -207,6 +208,9 @@ ArrAlph = np.tile(array_alphas, (v.shape[0],1,v.shape[2]))
 #print(ArrAlph[0,0,:])
 #print(ArrAlph[0,:,0])
 v_angle_corrected = v_converted_meters/np.cos(ArrAlph)
+"""
+v_angle_corrected = (1/np.cos(np.radians(alpha0_deg))) * v_converted_meters
+
 
 kappa_c_vals = []
 
@@ -238,6 +242,7 @@ for yind in yindices:
 
 plt.show()
 
+kappa_c_vals = np.array(kappa_c_vals)
 print(np.mean(np.array(kappa_c_vals)))
 print(np.std(np.array(kappa_c_vals)))
 
@@ -245,7 +250,7 @@ print(np.std(np.array(kappa_c_vals)))
 
 # %% enregistrement des données
 file_dict_results = 'R:/Gre25/Summary/fracture_postprocessing/resultats/fracture_results.pkl'
-
+"""
 if os.path.exists(file_dict_results):
     with open(file_dict_results, 'rb') as f:
         dict_results = pickle.load(f)
@@ -257,12 +262,23 @@ else:
 if date in dict_results:
     dict_results[date][name_frac_file] = {'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf, 'f_exc':f_exc}
 else:
-    dict_results[date] = {name_frac_file: {'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf},'f_exc':f_exc}
+    dict_results[date] = {name_frac_file: {'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf,'f_exc':f_exc}}
+
+
+"""
+
+if os.path.exists(file_dict_results):
+    with open(file_dict_results, 'rb') as f:
+        dict_results = pickle.load(f)
+else:
+    dict_results = {}
 
 
 
-
-
+if date in dict_results:
+    dict_results[date][name_frac_file] = {'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf,'f_exc':f_exc}
+else:
+    dict_results[date] = {name_frac_file: {'kappa_c_vals':kappa_c_vals, 'yindices':yindices , 'ypix':ypix[yindices], 'ypix_surf':ypix_surf,'f_exc':f_exc}}
 
 
 ee = input('Are you sure you want to erase last results ?(y/n)')

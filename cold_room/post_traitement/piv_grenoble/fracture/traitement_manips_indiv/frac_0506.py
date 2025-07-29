@@ -115,6 +115,7 @@ freq_acq = 20
 frame_frac = 698
 
 ypix_surf = 400
+alpha0_deg = 19.5 # angle caméra en degrés
 #computer = 'adour'
 
 system_loc = 'windows_server'
@@ -415,6 +416,7 @@ for yind in [3,4,5,6,7]:
 # et variation echelle horizontale vs y
 
 
+"""
 sys.path.append('C:/Users/Vasco Zanchi/Documents/git_turbotice/vasco/cold_room/post_traitement/piv_grenoble/fracture/python_functions/')
 
 from spatial_scale import *
@@ -428,6 +430,10 @@ ArrAlph = np.tile(array_alphas, (v.shape[0],1,v.shape[2]))
 #print(ArrAlph[0,0,:])
 #print(ArrAlph[0,:,0])
 v_angle_corrected = v_converted_meters/np.cos(ArrAlph)
+"""
+
+v_angle_corrected = (1/np.cos(np.radians(alpha0_deg))) * v_converted_meters
+
 
 
 ind_inf_fit = 25

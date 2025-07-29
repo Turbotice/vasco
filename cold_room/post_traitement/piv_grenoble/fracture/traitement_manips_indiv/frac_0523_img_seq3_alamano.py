@@ -70,7 +70,7 @@ kappa = 2*a
 kappa_c_vals = np.array([kappa,popt[0]*(2*np.pi/lambda_approx)**2])
 
 # correction angulaire (ça change un peu)
-kappa_c_vals = kappa_c_vals/np.cos(0.30138907)
+kappa_c_vals = kappa_c_vals/np.cos(np.radians(8))
 
 kappa_c_avg = np.mean(kappa_c_vals)
 kappa_c_std = np.std(kappa_c_vals)

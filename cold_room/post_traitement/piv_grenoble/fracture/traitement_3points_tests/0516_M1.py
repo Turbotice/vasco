@@ -112,7 +112,7 @@ print('h='+str(h_avg)+'+-'+str(h_std))
 
 
 def compute_kappa(delta,L):
-    return 4*delta/(L**2)
+    return 8*delta/(L**2)
 
 def compute_epsilon(kappa,h):
     return kappa*h/2

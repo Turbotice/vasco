@@ -90,7 +90,7 @@ freq_acq = 20
 frame_frac = 3209
 #computer = 'adour'
 ypix_surf = 486
-
+alpha0_deg = 15 # pas mesuré exactement
 
 system_loc = 'windows_server'
 
@@ -305,7 +305,7 @@ plt.show()
 
 # %% affichage de differents profils avec correction angulaire vs y 
 # et variation echelle horizontale vs y
-
+"""
 array_alphas = np.zeros(len(ypix))
 
 for i in range(len(ypix)):
@@ -315,6 +315,11 @@ ArrAlph = np.tile(array_alphas, (v.shape[0],1,v.shape[2]))
 #print(ArrAlph[0,0,:])
 #print(ArrAlph[0,:,0])
 v_angle_corrected = v_converted_meters/np.cos(ArrAlph)
+"""
+
+v_angle_corrected = (1/np.cos(np.radians(alpha0_deg))) * v_converted_meters
+
+
 
 kappa_c_velocity_vals = []
 
