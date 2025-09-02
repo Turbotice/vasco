@@ -12,6 +12,7 @@ import re
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle
+import csv
 #%% mettre les figures dans des fenetres
 #import matplotlib
 #matplotlib.use('TkAgg')
@@ -225,18 +226,30 @@ def routine(inputs,outputs,date,ordi='dell_vasco'):
 ########################################################################################
 
 # %%
-
+save = True
+savefolder = 'B:/General/Summary_geophone_lines/'
 
 inputs = {}
-inputs['0210'] = [1,2,3]
+# anse à Mercier
+inputs['0131'] = [1]
+inputs['0201'] = [1]
+inputs['0203'] = [1]
+
+# baie du Ha! Ha!
 inputs['0204'] = [1,2,3,4,5]
 inputs['0206'] = [1]
+inputs['0210'] = [1,2,3]
 inputs['0212'] = [1,2]
 inputs['0221'] = [1,2,3]
 inputs['0224'] = [1,2]
+inputs['0304'] = [1,2]
 
-#Dates = ['0210','0204','0206','0212','0221','0224']
-Dates = ['0204','0210','0224']
+# baie de Rimouski
+inputs['0227'] = [1,2]
+
+
+Dates = ['0131','0201','0203','0204','0206','0210','0212','0221','0224','0227','0304']
+#Dates = ['0204','0210','0224']
 
 
 outputs = {}
@@ -259,4 +272,27 @@ for date in outputs:
         count+=1
 
 plt.legend()
+
 # %%
+# fonction simple qui enregistre un fichier csv avec 
+# une premiere ligne qui contient les noms des colonnes et ensuites les colonnes
+
+csv_file_path = savefolder + 'all_geophone_lines_coordinates.csv'
+
+header = ['date', 'acq', 'longitude', 'latitude']
+
+data = []
+for d in Dates:
+    print(d,type(d))
+    for a in inputs[d]:
+        data.append([year + d, a, outputs[d]['acq'+str(a)]['avg_longitude'], outputs[d]['acq'+str(a)]['avg_latitude']])
+
+
+with open(csv_file_path, 'w', encoding='UTF8', newline='') as f:
+    writer = csv.writer(f,delimiter=',')
+
+    # write the header
+    writer.writerow(header)
+
+    # write multiple rows
+    writer.writerows(data)

@@ -92,3 +92,20 @@ def open_csv_table_experiments(file_path,delimiter=';'):
                 count += 1
     
     return (dict_lists , list_categories , list_types)
+
+"""
+# fonction simple qui enregistre un fichier csv avec 
+# une premiere ligne qui contient les noms des colonnes et ensuites les colonnes
+
+#csv_file_path = ''
+
+with open(csv_file_path, 'w', encoding='UTF8', newline='') as f:
+    writer = csv.writer(f)
+
+    # write the header
+    writer.writerow(header)
+
+    # write multiple rows
+    writer.writerows(data)
+
+"""
