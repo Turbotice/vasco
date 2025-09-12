@@ -45,16 +45,16 @@ from scipy.interpolate import interp1d
 
 #%% Set parameters 
 year = '2025'
-date = '0210' #date format, 'mmdd'
+date = '0131' #date format, 'mmdd'
 acqu_numb = '0001' #acquisition number 
 
-ordi = 'adour'
+ordi = 'dell_vasco'
 
 if ordi == 'babasse':
     path2data = os.path.join('E:/Data/',date,'Geophones/')
 elif ordi == 'dell_vasco':
-    path2data = f'S:/Data/{date}/Geophones/'
-#    path2data = f'D:/BicWin2025/Data/{date}/Geophones/'
+#    path2data = f'S:/Data/{date}/Geophones/'
+    path2data = f'D:/copie_BicWin25_geophones/Data/{date}/Geophones/'
 elif ordi == 'adour':
     path2data = f'/media/turbots/Shack25/Data/{date}/Geophones/'
 
@@ -71,6 +71,7 @@ elif ordi=='adour':
     geophones_table_path = f'/media/turbots/DATA/thiou/storageshared/Banquise/Vasco/Startup_kit_Stage_MSIM/data/geophones_table'
 
 channel = 0  # 0 for E, 1 for N, 2 for Z. 
+#composante = 'E'
 
 #files need to be organised as: data/0210/Geophones/0001/minised files
 
@@ -441,6 +442,7 @@ fig, ax = plt.subplots(figsize = fig_size)
 ax.plot(datetime_values,selected_stream[0].data / max(np.abs(selected_stream[0].data)))
 
 #%% tests pour detecter les chocs
+'''
 curdir = os.getcwd()
 os.chdir('Z:/vasco/Geophones/BicWin2025/python_functions/')
 from sismo_analysis import find_9shocks
@@ -449,7 +451,7 @@ os.chdir(curdir)
 typ_sig = selected_stream[0].data[90600:91600]
 find_9shocks(selected_stream[0].data[:14000],typ_sig)
 
-
+'''
 """
 plt.plot(selected_stream[0].data / max(np.abs(selected_stream[0].data)))
 plt.show()
@@ -647,7 +649,7 @@ time_dict[key] = UTCDateTime("2025-03-04T20:58:07.60")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '106' + composante 
 time_dict[key] = UTCDateTime("2025-03-04T21:01:26.70")
 """
-
+"""
 composante = 'E' #Z , E or N -> direction de la source
 
 # S101, S102, S103
@@ -665,7 +667,7 @@ key = 'd' + date + 'a' + acqu_numb + 'tS' + '105' + composante
 time_dict[key] = UTCDateTime("2025-03-04T20:58:52.00")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '106' + composante 
 time_dict[key] = UTCDateTime("2025-03-04T21:01:50.70")
-
+"""
 
 """
 composante = 'N' #Z , E or N -> direction de la source
@@ -689,8 +691,13 @@ time_dict[key] = UTCDateTime("2025-02-04T21:15:47.90")
 
 # Save t0 dictionnary in pickle file 
 
-with open(file2save, 'wb') as f:
-    pickle.dump(time_dict, f)
+savet0 = input('are you sure you want to save t0 dict ? y/n')
+
+if savet0=='y':
+    with open(file2save, 'wb') as f:
+        pickle.dump(time_dict, f)
+else:
+    pass
 
 print('Time dictionnary saved')
 
@@ -706,7 +713,7 @@ signal_length = 1 # duration in seconds
 # ch = channel_dic[channel]
 flexure_wave = composante == 'Z' # 1 to pick the dispersion curves of the flexure wave, 0 to pick those of the other 2 modes
 horizontal_wave = not flexure_wave
-direction = 1 # 1 ou 2 
+direction = 2 # 1 ou 2 
 # assign a string to S values depending on the direction
 if direction == 1 :
     S1 = '101' 
@@ -721,8 +728,8 @@ if direction == 2:
 if ordi=='babasse': 
     base = f'E:/Data/{date}/Geophones/'
 elif ordi=='dell_vasco':
-    base = f'S:/Data/{date}/Geophones/'
-    base = f'D:/BicWin2025/Data/{date}/Geophones/'
+    #base = f'S:/Data/{date}/Geophones/'
+    base = f'D:/copie_BicWin25_geophones/Data/{date}/Geophones/'
 
 pkl_path = base + 't1_to_time_' + date + '_' + year  + '.pkl'
 

@@ -82,12 +82,11 @@ plt.figure()
 plt.plot(tidelevels)
 plt.show()
 # %% def savetides function
-
 import os
 import csv
 from datetime import datetime
 
-def save_tides(dates, tidelevels, base_path, mmdd):
+def save_tides(dates, tidelevels, base_path, mmdd, overwrite=False):
     """
     Sauvegarde les données de marée pour un jour donné dans un fichier CSV structuré.
 
@@ -96,9 +95,10 @@ def save_tides(dates, tidelevels, base_path, mmdd):
         tidelevels (list[float]): niveaux de marée correspondants
         base_path (str): chemin de base, ex: 'D:/copie_BicWin25_geophones/Data'
         mmdd (str): date sous la forme 'mmdd' (ex: '0218')
+        overwrite (bool): si True, écrase le fichier CSV existant
 
     Raises:
-        FileExistsError: si le fichier de sortie existe déjà
+        FileExistsError: si le fichier existe déjà et overwrite=False
         ValueError: si aucune donnée ne correspond à la date choisie
     """
 
@@ -125,20 +125,23 @@ def save_tides(dates, tidelevels, base_path, mmdd):
     filepath = os.path.join(target_dir, filename)
 
     # Vérifier si le fichier existe déjà
-    if os.path.exists(filepath):
+    if os.path.exists(filepath) and not overwrite:
         raise FileExistsError(f"❌ Le fichier existe déjà : {filepath}")
 
-    # Écriture du CSV
+    # Écriture du CSV (écrasement si overwrite=True)
     with open(filepath, mode="w", newline="") as f:
-        writer = csv.writer(f, delimiter="\t")
+        writer = csv.writer(f, delimiter=",")
         writer.writerow(["date", "tide_height"])  # en-tête
         for d, t in zip(selected_dates, selected_tides):
             writer.writerow([d, f"{t:.3f}"])
 
-    print(f"✅ Fichier enregistré : {filepath}")
+    if overwrite:
+        print(f"⚠️ Fichier écrasé et remplacé : {filepath}")
+    else:
+        print(f"✅ Fichier enregistré : {filepath}")
 
 
 # %%
-save_tides(dates=dates_newformat,tidelevels=tidelevels, base_path='D:/copie_BicWin25_geophones/a_copier_sur_backup25/Data/',mmdd='0304')
+save_tides(dates=dates_newformat,tidelevels=tidelevels, base_path='D:/copie_BicWin25_geophones/Data/',mmdd='0304',overwrite=True)
 
 # %%
