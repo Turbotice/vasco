@@ -45,7 +45,7 @@ from scipy.interpolate import interp1d
 
 #%% Set parameters 
 year = '2025'
-date = '0131' #date format, 'mmdd'
+date = '0212' #date format, 'mmdd'
 acqu_numb = '0001' #acquisition number 
 
 ordi = 'dell_vasco'
@@ -53,7 +53,7 @@ ordi = 'dell_vasco'
 if ordi == 'babasse':
     path2data = os.path.join('E:/Data/',date,'Geophones/')
 elif ordi == 'dell_vasco':
-#    path2data = f'S:/Data/{date}/Geophones/'
+#    path2data = f'B:/Data/{date}/Geophones/'
     path2data = f'D:/copie_BicWin25_geophones/Data/{date}/Geophones/'
 elif ordi == 'adour':
     path2data = f'/media/turbots/Shack25/Data/{date}/Geophones/'
@@ -70,8 +70,8 @@ elif ordi=='dell_vasco':
 elif ordi=='adour':
     geophones_table_path = f'/media/turbots/DATA/thiou/storageshared/Banquise/Vasco/Startup_kit_Stage_MSIM/data/geophones_table'
 
-channel = 0  # 0 for E, 1 for N, 2 for Z. 
-#composante = 'E'
+channel = 2  # 0 for E, 1 for N, 2 for Z. 
+composante = 'Z'
 
 #files need to be organised as: data/0210/Geophones/0001/minised files
 
@@ -613,6 +613,7 @@ plt.savefig(figname + '.png',dpi = img_quality ,bbox_inches = 'tight')
 
 
 #################################################################################
+
 #%%----------------------- SELECTING TIME RANGE FOR PROCESSING ------------------ 
 #################################################################################
 # Select signal segments manually for each track and each source 
@@ -835,9 +836,9 @@ F, K_uwp = np.meshgrid(f, k_uwp)
 ################################################
 
 vmin = 0     # Minimum value for colormap
-vmax = 1     # Maximum value for colormap (adjust as needed)
+vmax = 0.6     # Maximum value for colormap (adjust as needed)
 ymin = 0  # Minimum frequency
-ymax = 400  # Maximum frequency
+ymax = 50  # Maximum frequency
 xmin = 0  # Minimum wavenumber
 xmax = 4  # Maximum wavenumber
 
@@ -880,7 +881,7 @@ if flexure_wave:
     ax1.set_title('Spectrum with SVD filter')
     plt.colorbar(c1, ax=ax1, label='Spectrum Magnitude')
 
-    ax1.set_ylim([0, 400])
+    ax1.set_ylim([ymin, ymax])
     print(f"Select {nb_points} points on the graph")
     points = plt.ginput(nb_points, timeout=-1)
 
@@ -930,7 +931,8 @@ if flexure_wave:
 #    plt.ylabel(r'$f \; \mathrm{(Hz)}$')
     plt.ylabel('$f$ $(Hz)$')
     plt.xlabel('$k$ $(m^{-1})$')
-
+    
+    
     plt.legend()
     plt.show()
 
@@ -1138,9 +1140,11 @@ with open(file2save, 'wb') as file:
     pickle.dump(wave_speed, file)
 
 #%% Save (f,k) points associated to QS mode 
-file2save = path2data + year + '_' + date + '_acq'+acqu_numb+ 'disp_QS_dir' + str(direction) +'.pkl'
-with open(file2save, 'wb') as file:
-     pickle.dump([f_mode, k_mode], file)
+saveflexural = input('are you sure you want to overwrite flexural data?')
+if saveflexural=='y':
+    file2save = path2data + year + '_' + date + '_acq'+acqu_numb+ 'disp_QS_dir' + str(direction) +'.pkl'
+    with open(file2save, 'wb') as file:
+        pickle.dump([f_mode, k_mode], file)
      
      
 #%% Invert ice thickness by hand 

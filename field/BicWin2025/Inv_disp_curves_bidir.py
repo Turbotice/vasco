@@ -21,8 +21,8 @@ import seaborn as sns
 plt.close('all')
 
 year = '2025'
-date = '0131' #date format, 'mmdd'
-acqu_numb = '000' #acquisition number 
+date = '0212' #date format, 'mmdd'
+acqu_numb = '0001' #acquisition number 
 equation = 'stein'
 
 ordi = 'dell_vasco'

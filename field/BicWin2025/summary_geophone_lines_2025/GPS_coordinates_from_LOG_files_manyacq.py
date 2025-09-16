@@ -52,7 +52,8 @@ def routine(inputs,outputs,date,ordi='dell_vasco'):
     #    path2logfile = f'X:/Banquise/Vasco/Startup_kit_Stage_MSIM/data/{year}_BICWIN/{date}/Geophones' # arborescence sur storageshared
     #    geophones_table_path = f'X:/Banquise/Vasco/Startup_kit_Stage_MSIM/data/geophones_table' # arborescence sur storageshared
     #    path2logfile = f'D:/BicWin2025/Data/{date}/Geophones' # arborescence sur storageshared
-        path2logfile = f'B:/Data/{date}/Geophones'
+        path2logfile = f'D:/copie_BicWin25_geophones/Data/{date}/Geophones'
+        #path2logfile = f'B:/Data/{date}/Geophones'
         geophones_table_path = f'X:/Banquise/Vasco/Startup_kit_Stage_MSIM/data/geophones_table' # arborescence sur storageshared
         
 
@@ -268,6 +269,7 @@ for date in outputs:
             plt.plot(outputs[date][acq_key]['avg_longitude'],outputs[date][acq_key]['avg_latitude'],'o',label=date+', '+acq_key)
         elif count>=10:
             plt.plot(outputs[date][acq_key]['avg_longitude'],outputs[date][acq_key]['avg_latitude'],'s',label=date+', '+acq_key)
+
 
         count+=1
 
