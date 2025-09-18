@@ -447,7 +447,7 @@ T0param = 0.25; Tminparam = 0.25 # minimal and maximal range of the step for Met
 # extremal values of the fitted parameters
 min_thickness = 0.1
 max_thickness = 1.5
-min_E = 1.5e9
+min_E = 0.5e9
 max_E = 8e9
 min_nu = 0.15
 max_nu = 0.45
