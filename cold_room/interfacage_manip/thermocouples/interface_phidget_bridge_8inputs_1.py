@@ -14,7 +14,7 @@ save = False
 
 def create_new_data_file(name_output_file):
     file = open(name_output_file,'w')
-    file.write('time V0 V1 V2 V3\n')
+    file.write('time V0 V1 V2 V3 V4 V5 V6 V7\n')
     file.close()
 
 def add_text_to_data_file(name_output_file, text):

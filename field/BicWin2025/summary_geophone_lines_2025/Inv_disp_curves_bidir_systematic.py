@@ -1,42 +1,105 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jun 25 15:06:08 2024
-
-@author: moreaul
-"""
 #%%
 
 import numpy as np
 from random import random
 import matplotlib.pyplot as plt 
 import pickle
+import csv
 import os , sys
 import time
 from scipy.interpolate import interp1d
 import seaborn as sns
 
 
+
 #%%-------------------------------LOADING DATA--------------------------------------------------------------------------
 plt.close('all')
 
 year = '2025'
-date = '0203' #date format, 'mmdd'
+date = '0212' #date format, 'mmdd'
 acqu_numb = '0001' #acquisition number 
-equation = 'stein'
+equation = 'squire'
 
 ordi = 'dell_vasco'
-# path to dispersion relation data 
 
+# disk :
 if ordi=='adour':
-    path2data = f'/media/turbots/Backup25/Data/{date}/Geophones/'
+    disk = '/media/turbots/Backup25'
 elif ordi=='babasse':
-    path2data = os.path.join('E:/Data/',date,'Geophones/')
+    disk = 'E:'
 elif ordi=='dell_vasco':
-    #path2data = f'B:/Data/{date}/Geophones/'
-    path2data = f'D:/copie_BicWin25_geophones/Data/{date}/Geophones/'
-# path2data = 'C:/Users/sebas/icewave/icewave/sebastien/geophones/updatescriptspython/0211/Geophones/'
-# path2data = '/Users/moreaul/Documents/Travail/Projets_Recherche/MSIM/data/' +year+'_BICWIN/'
+    disk = 'B:'
+
+
+# path to dispersion relation data 
+path2data = f'{disk}/Data/{date}/Geophones/'
+
+# path to the water depth file
+path2waterlevel = f'{disk}/General/Summary_geophone_lines/water_level_acquisitions/coord_waterlevel_allacq.csv'
+
+with open(path2waterlevel, mode ='r')as file:
+    csvFile = csv.reader(file, delimiter=',')
+    count=0
+    data1 = []
+    for lines in csvFile:
+        if count==0:
+            header1 = lines
+        else:
+            data1.append(lines)
+        count+=1
+print(header1)
+
+idx = np.nan
+for i in range(len(data1)):
+    if (data1[i][0] == year+date) & (int(data1[i][1]) == int(acqu_numb)):
+        idx = i
+    else:
+        pass
+# on assign la valeur de H trouvée (peut être négative pour l'instant)
+H = float(data1[idx][4])
+print('Depth (m) :',H)
+if H<0:
+    print('No water below ! Inversion using flexural dispersion relation might be wrong !')
+
+# Load (f,k) points of QS dispersion relation 
+direction = 1 # 1 ou 2 
+filename = year + '_' + date + '_acq'+acqu_numb+ 'disp_QS_dir' +str(direction) +'.pkl'
+# file2load1 = path2data  + date + '/Geophones/' + filename
+file2load1  = os.path.join(path2data,filename)
+with open(file2load1, "rb") as f:
+    data = pickle.load(f)
+freq1 = data[0] 
+kQS1 = data[1] 
+
+# Load (f,k) points of QS dispersion relation
+direction = 2 # 1 ou 2 
+filename = year + '_' + date + '_acq'+acqu_numb+ 'disp_QS_dir' +str(direction) +'.pkl'
+# file2load1 = path2data  + date + '/Geophones/' + filename
+file2load1  = os.path.join(path2data,filename)
+with open(file2load1, "rb") as f:
+    data = pickle.load(f)
+freq2 = data[0] 
+kQS2 = data[1] 
+
+
+mini = max(min(freq1),min(freq2))
+maxi = min(max(freq1),max(freq2))
+freq = np.linspace(mini,maxi , 15)
+
+# Interpolate kQS1 at the new frequency points, without extrapolation
+interpolator1 = interp1d(freq1, kQS1)
+kQS1_interp = interpolator1(freq)
+
+# Interpolate kQS2 at the new frequency points, without extrapolation
+interpolator2 = interp1d(freq2, kQS2)
+kQS2_interp = interpolator2(freq)
+
+# Calculate the average values, ignoring NaNs
+kQS = np.nanmean([kQS1_interp, kQS2_interp], axis=0)
+
+
+
+
 
 #%% Load data for inversion 
 # file that will be saved 
@@ -82,48 +145,26 @@ E = rho_ice*data['cQS0']**2*(1-nu**2)
 
 print(f'Young modulus, E = {E*1e-9} and Poisson coefficient, nu = {nu}')
 
-#########################################################################
-
-#%%
 
 
-# Load (f,k) points of QS dispersion relation 
-direction = 1 # 1 ou 2 
-filename = year + '_' + date + '_acq'+acqu_numb+ 'disp_QS_dir' +str(direction) +'.pkl'
-# file2load1 = path2data  + date + '/Geophones/' + filename
-file2load1  = os.path.join(path2data,filename)
-with open(file2load1, "rb") as f:
-    data = pickle.load(f)
-freq1 = data[0] 
-kQS1 = data[1] 
-
-# Load (f,k) points of QS dispersion relation
-direction = 2 # 1 ou 2 
-filename = year + '_' + date + '_acq'+acqu_numb+ 'disp_QS_dir' +str(direction) +'.pkl'
-# file2load1 = path2data  + date + '/Geophones/' + filename
-file2load1  = os.path.join(path2data,filename)
-with open(file2load1, "rb") as f:
-    data = pickle.load(f)
-freq2 = data[0] 
-kQS2 = data[1] 
 
 
-mini = max(min(freq1),min(freq2))
-maxi = min(max(freq1),max(freq2))
-freq = np.linspace(mini,maxi , 15)
+##################
+# rajouté par vasco pour fitte vite fait hydroelastic
+def hydroelastic(k,D):
+    g=9.81
+    rho=900
+    omega = np.sqrt(g*k+(D/rho)*(k**5))
+    return (1/(2*np.pi))*omega
+from scipy.optimize import curve_fit
+popt,pcov= curve_fit(hydroelastic,kQS,freq)
+print('First guess :')
+print('D = ',popt,'+-',np.sqrt(pcov),' J')
+print(((12*(popt)*(1-nu)**2)/E)**(1/3)) # estimation epaisseur
+##################
 
-# Interpolate kQS1 at the new frequency points, without extrapolation
-interpolator1 = interp1d(freq1, kQS1)
-kQS1_interp = interpolator1(freq)
 
-# Interpolate kQS2 at the new frequency points, without extrapolation
-interpolator2 = interp1d(freq2, kQS2)
-kQS2_interp = interpolator2(freq)
-
-# Calculate the average values, ignoring NaNs
-kQS = np.nanmean([kQS1_interp, kQS2_interp], axis=0)
-
-
+# ... and a first guess for flexural modulus...
 # Plot the results
 plt.figure(figsize=(12, 6))
 plt.plot(kQS1, freq1,  'bo', label='kQS1')
@@ -143,7 +184,7 @@ plt.show()
 
 
 
-
+#########################################################################
 #%%----------------------- PROCEED INVERSION ---------------------------
 #########################################################################
 
@@ -234,7 +275,7 @@ def wavenumbers_stein_squire( rho_ice, h, H, E, nu,freq,c_w,rho_w,equation):
                 coth = 1 / np.tanh(k* H)
                 func = pow(omeg, 2)*(k*h*rho_ice/rho_w + coth) - D*pow(k, 5)/rho_w - g * k 
             else:
-                print('unapropriate equation name: chose between stein or squire ')
+                print('unapropriate equation name: choose between stein or squire ')
             
             func[func.imag != 0] = -1
             func = func.real
@@ -277,7 +318,7 @@ def simulated_annealing(delta_param0, T0, T0param, Tmin, Tminparam, X, MIN_param
         - misfit_accepted : error to experimental values of kQS, cQS0 and cQSH0 for each generated set of parameters
         """
         
-    H = 1 # water depth
+    #H = 1 # water depth
     c_w = 1450 # sound waves velocity in water
     rho_w = 1027 # water density 
     freq = data['freq']

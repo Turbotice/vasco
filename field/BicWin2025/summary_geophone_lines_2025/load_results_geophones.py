@@ -14,7 +14,7 @@ import seaborn as sns
 plt.close('all')
 
 year = '2025'
-date = '0212' #date format, 'mmdd'
+date = '0304' #date format, 'mmdd'
 acqu_numb = '0002' #acquisition number 
 equation = 'stein'
 
@@ -143,8 +143,9 @@ data = {
 #%% Find a first guess of E and nu, assuming a given density for ice 
 
 rho_ice = 917
-nu = 0.3#1-2*(data['cSH0']/data['cQS0'])**2
+nu = 1-2*(data['cSH0']/data['cQS0'])**2
 E = rho_ice*data['cQS0']**2*(1-nu**2)
+
 
 print(f'Young modulus, E = {E*1e-9} and Poisson coefficient, nu = {nu}')
 

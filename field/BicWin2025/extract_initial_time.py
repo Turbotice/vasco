@@ -45,8 +45,8 @@ from scipy.interpolate import interp1d
 
 #%% Set parameters 
 year = '2025'
-date = '0212' #date format, 'mmdd'
-acqu_numb = '0001' #acquisition number 
+date = '0227' #date format, 'mmdd'
+acqu_numb = '0002' #acquisition number 
 
 ordi = 'dell_vasco'
 
@@ -636,59 +636,58 @@ else:
 composante = 'Z'
 # S101, S102, S103
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '101' + composante 
-time_dict[key] = UTCDateTime("2025-03-04T20:47:42.50")
+time_dict[key] = UTCDateTime("2025-02-27T17:37:05.70")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '102' + composante 
-time_dict[key] = UTCDateTime("2025-03-04T20:50:00.20")
+time_dict[key] = UTCDateTime("2025-02-27T17:38:33.40")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '103' + composante 
-time_dict[key] = UTCDateTime("2025-03-04T20:52:40.70")
+time_dict[key] = UTCDateTime("2025-02-27T17:39:55.40")
 
 # # S104, S105, S106
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '104' + composante 
-time_dict[key] = UTCDateTime("2025-03-04T20:56:39.30")
+time_dict[key] = UTCDateTime("2025-02-27T17:47:05.20")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '105' + composante 
-time_dict[key] = UTCDateTime("2025-03-04T20:58:07.60")
+time_dict[key] = UTCDateTime("2025-02-27T17:47:58.50")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '106' + composante 
-time_dict[key] = UTCDateTime("2025-03-04T21:01:26.70")
+time_dict[key] = UTCDateTime("2025-02-27T17:48:49.90")
 """
+
 """
 composante = 'E' #Z , E or N -> direction de la source
 
 # S101, S102, S103
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '101' + composante 
-time_dict[key] = UTCDateTime("2025-03-04T20:48:15.70")
+time_dict[key] = UTCDateTime("2025-02-27T17:37:35.20")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '102' + composante 
-time_dict[key] = UTCDateTime("2025-03-04T20:50:41.20")
+time_dict[key] = UTCDateTime("2025-02-27T17:38:53.40")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '103' + composante 
-time_dict[key] = UTCDateTime("2025-03-04T20:53:33.70")
+time_dict[key] = UTCDateTime("2025-02-27T17:40:16.70")
 
 # # S104, S105, S106
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '104' + composante 
-time_dict[key] = UTCDateTime("2025-03-04T20:57:10.90")
+time_dict[key] = UTCDateTime("2025-02-27T17:47:25.70")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '105' + composante 
-time_dict[key] = UTCDateTime("2025-03-04T20:58:52.00")
+time_dict[key] = UTCDateTime("2025-02-27T17:48:23.47")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '106' + composante 
-time_dict[key] = UTCDateTime("2025-03-04T21:01:50.70")
+time_dict[key] = UTCDateTime("2025-02-27T17:49:08.30")
 """
 
-"""
 composante = 'N' #Z , E or N -> direction de la source
 
 # S101, S102, S103
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '101' + composante 
-time_dict[key] = UTCDateTime("2025-02-04T20:48:22.30")
+time_dict[key] = UTCDateTime("2025-02-27T17:38:02.50")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '102' + composante 
-time_dict[key] = UTCDateTime("2025-02-04T21:10:44.60")
+time_dict[key] = UTCDateTime("2025-02-27T17:39:13.60")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '103' + composante 
-time_dict[key] = UTCDateTime("2025-02-04T21:11:33.30")
+time_dict[key] = UTCDateTime("2025-02-27T17:40:36.40")
 
 # # S104, S105, S106
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '104' + composante 
-time_dict[key] = UTCDateTime("2025-02-04T21:13:32.10")
+time_dict[key] = UTCDateTime("2025-02-27T17:47:40.00")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '105' + composante 
-time_dict[key] = UTCDateTime("2025-02-04T21:14:49.40")
+time_dict[key] = UTCDateTime("2025-02-27T17:48:30.00")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '106' + composante 
-time_dict[key] = UTCDateTime("2025-02-04T21:15:47.90")
-"""
+time_dict[key] = UTCDateTime("2025-02-27T17:49:23.60")
 
 # Save t0 dictionnary in pickle file 
 
@@ -697,10 +696,10 @@ savet0 = input('are you sure you want to save t0 dict ? y/n')
 if savet0=='y':
     with open(file2save, 'wb') as f:
         pickle.dump(time_dict, f)
+    print('Time dictionnary saved')
 else:
     pass
 
-print('Time dictionnary saved')
 
 ###########################################################
 #%% -------------- Compute FK data ----------------------
@@ -714,7 +713,7 @@ signal_length = 1 # duration in seconds
 # ch = channel_dic[channel]
 flexure_wave = composante == 'Z' # 1 to pick the dispersion curves of the flexure wave, 0 to pick those of the other 2 modes
 horizontal_wave = not flexure_wave
-direction = 2 # 1 ou 2 
+direction = 1 # 1 ou 2 
 # assign a string to S values depending on the direction
 if direction == 1 :
     S1 = '101' 
@@ -836,9 +835,9 @@ F, K_uwp = np.meshgrid(f, k_uwp)
 ################################################
 
 vmin = 0     # Minimum value for colormap
-vmax = 0.6     # Maximum value for colormap (adjust as needed)
+vmax = 1     # Maximum value for colormap (adjust as needed)
 ymin = 0  # Minimum frequency
-ymax = 50  # Maximum frequency
+ymax = 400  # Maximum frequency
 xmin = 0  # Minimum wavenumber
 xmax = 4  # Maximum wavenumber
 
