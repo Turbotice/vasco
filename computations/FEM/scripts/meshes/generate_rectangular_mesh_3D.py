@@ -1,13 +1,13 @@
 #%%
 # USER PARAMETERS (edit these lines as you wish)
-# distances in cm :
-plate_length_x = 8      # total extent in x-direction
-plate_width_y = 4       # total extent in y-direction
-plate_thickness_z = 0.4   # total extent in z-direction
+# distances in m :
+plate_length_x = 8e-2      # total extent in x-direction
+plate_width_y = 4e-2       # total extent in y-direction
+plate_thickness_z = 4e-3   # total extent in z-direction
 
-nx_cells = 20              # number of elements along x
-ny_cells = 10              # number of elements along y
-nz_cells = 5              # number of elements along z
+nx_cells = 40              # number of elements along x
+ny_cells = 20              # number of elements along y
+nz_cells = 10              # number of elements along z
 
 region_id = 1             # region id for hexahedra
 
@@ -79,7 +79,8 @@ for i,h in enumerate(hexes[:8],1):
 # Provide link for download
 out_path
 
-# %%
+# %% if we want to visualize the mesh
+
 import pyvista as pv
 import numpy as np
 
@@ -116,5 +117,34 @@ plotter.show_bounds(
 )
 
 plotter.show()
+
+# %% save the characteristics of the rectangular plate
+
+data2save = np.array([plate_length_x,plate_width_y,plate_thickness_z,nx_cells,ny_cells,nz_cells])
+np.savetxt(f"{disk}/FEM/meshes/3d/plate_info.txt",data2save)
+
+# %% save the points on which to apply the force (3pts bending)
+
+tol = 1e-6  # or slightly larger if needed
+"""
+'TopMiddleLine': (
+    f'vertices in (x > {0.49*plate_length_x - tol}) & '
+    f'(x < {0.51*plate_length_x + tol}) & '
+    f'(z > {plate_thickness_z - tol})',
+    'vertex'
+),
+"""
+arr_x = nodes[:,0]
+arr_y = nodes[:,1]
+arr_z = nodes[:,2]
+
+indices_TopMiddleLine = np.where((arr_x > 0.49*(plate_length_x-tol)) & (arr_x < 0.51*plate_length_x + tol) & (arr_z > plate_thickness_z - tol))[0]
+
+nodes_TopMiddleLine = nodes[indices_TopMiddleLine,:]
+
+data2save = np.zeros((nodes_TopMiddleLine.shape[0],4))
+data2save[:,1:] = nodes_TopMiddleLine
+data2save[:,0] = indices_TopMiddleLine.T
+np.savetxt(f"{disk}/FEM/meshes/3d/nodes_TopMiddleLine.txt",data2save)
 
 # %%
