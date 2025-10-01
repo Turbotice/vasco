@@ -16,7 +16,7 @@ import seaborn as sns
 plt.close('all')
 
 year = '2025'
-date = '0212' #date format, 'mmdd'
+date = '0210' #date format, 'mmdd'
 acqu_numb = '0001' #acquisition number 
 equation = 'squire'
 
@@ -147,7 +147,7 @@ print(f'Young modulus, E = {E*1e-9} and Poisson coefficient, nu = {nu}')
 
 
 
-
+"""
 
 ##################
 # rajouté par vasco pour fitte vite fait hydroelastic
@@ -182,7 +182,7 @@ plt.legend()
 plt.title('Comparison and Average of kQS1 and kQS2')
 plt.show()
 
-
+"""
 
 #########################################################################
 #%%----------------------- PROCEED INVERSION ---------------------------

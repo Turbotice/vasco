@@ -632,63 +632,64 @@ else:
     print('No time dictionnary saved yet')
     time_dict = {}
 
-"""
+
 composante = 'Z'
 # S101, S102, S103
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '101' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:37:05.70")
+time_dict[key] = UTCDateTime("2025-02-27T18:25:58.50")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '102' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:38:33.40")
+time_dict[key] = UTCDateTime("2025-02-27T18:27:40.00")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '103' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:39:55.40")
+time_dict[key] = UTCDateTime("2025-02-27T18:28:46.10")
 
 # # S104, S105, S106
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '104' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:47:05.20")
+time_dict[key] = UTCDateTime("2025-02-27T18:32:26.40")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '105' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:47:58.50")
+time_dict[key] = UTCDateTime("2025-02-27T18:33:38.70")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '106' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:48:49.90")
-"""
+time_dict[key] = UTCDateTime("2025-02-27T18:34:48.50")
+
 
 """
 composante = 'E' #Z , E or N -> direction de la source
 
 # S101, S102, S103
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '101' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:37:35.20")
+time_dict[key] = UTCDateTime("2025-02-27T18:26:36.60")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '102' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:38:53.40")
+time_dict[key] = UTCDateTime("2025-02-27T18:27:56.80")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '103' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:40:16.70")
+time_dict[key] = UTCDateTime("2025-02-27T18:29:03.90")
 
 # # S104, S105, S106
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '104' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:47:25.70")
+time_dict[key] = UTCDateTime("2025-02-27T18:32:49.30")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '105' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:48:23.47")
+time_dict[key] = UTCDateTime("2025-02-27T18:34:02.20")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '106' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:49:08.30")
+time_dict[key] = UTCDateTime("2025-02-27T18:35:22.20")
 """
 
+"""
 composante = 'N' #Z , E or N -> direction de la source
 
 # S101, S102, S103
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '101' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:38:02.50")
+time_dict[key] = UTCDateTime("2025-02-27T18:26:53.90")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '102' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:39:13.60")
+time_dict[key] = UTCDateTime("2025-02-27T18:28:15.30")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '103' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:40:36.40")
+time_dict[key] = UTCDateTime("2025-02-27T18:29:26.30")
 
 # # S104, S105, S106
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '104' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:47:40.00")
+time_dict[key] = UTCDateTime("2025-02-27T18:33:13.90")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '105' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:48:30.00")
+time_dict[key] = UTCDateTime("2025-02-27T18:34:30.80")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '106' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T17:49:23.60")
-
+time_dict[key] = UTCDateTime("2025-02-27T18:35:41.20")
+"""
 # Save t0 dictionnary in pickle file 
 
 savet0 = input('are you sure you want to save t0 dict ? y/n')
