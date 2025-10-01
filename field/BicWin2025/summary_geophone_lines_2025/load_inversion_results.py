@@ -92,12 +92,12 @@ pkl_file_path = f"{disk}/Data/{date}/Geophones/{year}_{date}_acq{acqstr}_bidir_i
 
 dict_results[dateacq] = open_inverted_data(pkl_file_path)
 
-argmaxkde = find_max_kde(dict_results[dateacq]['data_to_plot_'+str(idx_datatoplot)])
-maxvalkde = dict_results[dateacq]['data_to_plot_'+str(idx_datatoplot)][argmaxkde]
+argmaxkde = find_max_kde(dict_results[dateacq]['data_to_plot_'+str(idx_datatoplot)]['values'])
+maxvalkde = dict_results[dateacq]['data_to_plot_'+str(idx_datatoplot)]['values'][argmaxkde]
 
 
 
-# %% extract all young's moduli
+# %% range tous les histogrammes dans un dico
 
 for i in range(len(dict_results['inverted_data'])):
     dateacq = dict_results['inverted_data'][i]
@@ -108,15 +108,15 @@ for i in range(len(dict_results['inverted_data'])):
 
     dict_results[dateacq] = open_inverted_data(pkl_file_path)
 
-    
+#%% choisir ce qui nous interesse (Young? Epaisseur? ...) et ca donne la valeur max de la kde
 
 idx_datatoplot = 1 # thickness : 0 ; Young: 1 ; Poisson : 2 ; rho : 3
 
 list_argmaxkde = []
 list_maxvalkde =[]
 
-argmaxkde = find_max_kde(dict_results[dateacq]['data_to_plot_'+str(idx_datatoplot)])
-maxvalkde = dict_results[dateacq]['data_to_plot_'+str(idx_datatoplot)][argmaxkde]
+argmaxkde = find_max_kde(dict_results[dateacq]['data_to_plot_'+str(idx_datatoplot)]['values'])
+maxvalkde = dict_results[dateacq]['data_to_plot_'+str(idx_datatoplot)]['values'][argmaxkde]
 
 
 
