@@ -15,7 +15,7 @@ plt.close('all')
 
 year = '2025'
 date = '0304' #date format, 'mmdd'
-acqu_numb = '0002' #acquisition number 
+acqu_numb = '0001' #acquisition number 
 equation = 'stein'
 
 ordi = 'dell_vasco'
@@ -26,8 +26,8 @@ if ordi=='adour':
 elif ordi=='babasse':
     path2data = os.path.join('E:/Data/',date,'Geophones/')
 elif ordi=='dell_vasco':
-    path2data = f'D:/copie_BicWin25_geophones/Data/{date}/Geophones/'
-    #path2data = f'B:/Data/{date}/Geophones/'
+    #path2data = f'D:/copie_BicWin25_geophones/Data/{date}/Geophones/'
+    path2data = f'B:/Data/{date}/Geophones/'
 # path2data = 'C:/Users/sebas/icewave/icewave/sebastien/geophones/updatescriptspython/0211/Geophones/'
 # path2data = '/Users/moreaul/Documents/Travail/Projets_Recherche/MSIM/data/' +year+'_BICWIN/'
 

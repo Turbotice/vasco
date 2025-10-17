@@ -568,7 +568,7 @@ plt.savefig(figname + '.png',dpi = img_quality,bbox_inches = 'tight')
 # ax.plot(datetime_values, 
 #         current_stream[0].data / max(np.abs(current_stream[0].data) ), 
 #         label=f"Stream {k}")
-# selected_indices = range(channel, len(seismic_data_streams) - 3,3)
+# selected_indices = range(channel, len(s²eismic_data_streams) - 3,3)
 
 selected_indices = range(channel, len(seismic_data_streams),3)
 fig, ax = plt.subplots(figsize = fig_size)
@@ -636,19 +636,19 @@ else:
 composante = 'Z'
 # S101, S102, S103
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '101' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T18:25:58.50")
+time_dict[key] = UTCDateTime("2025-02-21T16:14:11.20")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '102' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T18:27:40.00")
+time_dict[key] = UTCDateTime("2025-02-21T16:17:58.20")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '103' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T18:28:46.10")
+time_dict[key] = UTCDateTime("2025-02-21T16:22:04.00")
 
 # # S104, S105, S106
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '104' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T18:32:26.40")
+time_dict[key] = UTCDateTime("2025-02-21T16:28:54.50")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '105' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T18:33:38.70")
+time_dict[key] = UTCDateTime("2025-02-21T16:29:00.30")
 key = 'd' + date + 'a' + acqu_numb + 'tS' + '106' + composante 
-time_dict[key] = UTCDateTime("2025-02-27T18:34:48.50")
+time_dict[key] = UTCDateTime("2025-02-21T16:30:31.00")
 
 
 """
@@ -714,7 +714,7 @@ signal_length = 1 # duration in seconds
 # ch = channel_dic[channel]
 flexure_wave = composante == 'Z' # 1 to pick the dispersion curves of the flexure wave, 0 to pick those of the other 2 modes
 horizontal_wave = not flexure_wave
-direction = 1 # 1 ou 2 
+direction = 2 # 1 ou 2 
 # assign a string to S values depending on the direction
 if direction == 1 :
     S1 = '101' 
@@ -729,8 +729,8 @@ if direction == 2:
 if ordi=='babasse': 
     base = f'E:/Data/{date}/Geophones/'
 elif ordi=='dell_vasco':
-    #base = f'S:/Data/{date}/Geophones/'
-    base = f'D:/copie_BicWin25_geophones/Data/{date}/Geophones/'
+    base = f'B:/Data/{date}/Geophones/'
+    #base = f'D:/copie_BicWin25_geophones/Data/{date}/Geophones/'
 
 pkl_path = base + 't1_to_time_' + date + '_' + year  + '.pkl'
 
