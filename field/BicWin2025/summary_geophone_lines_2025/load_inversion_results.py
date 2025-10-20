@@ -109,9 +109,7 @@ for i in range(len(dict_results['inverted_data'])):
 
     dict_results[dateacq] = open_inverted_data(pkl_file_path)
 
-#%% choisir ce qui nous interesse (Epaisseur? Young? ...) et ca donne la valeur max de la kde
-
-idx_datatoplot = 1 # thickness : 0 ; Young: 1 ; Poisson : 2 ; rho : 3
+#%% ranger les max des kde por chaque quantité (epaisseur, young...)
 
 list_argmaxkde = []
 list_maxvalkde =[]

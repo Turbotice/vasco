@@ -89,10 +89,7 @@ east_haha = -68.80077777777778
 north_haha = 48.3564444
 south_haha = 48.33393038416758
 
-plt.figure()
-plt.plot(convert_array1d_to_datetimearray(data_csv[:,5]), convert_array1d_to_floatarray(data_csv[:,7]), '.b')
-plt.ylim(0, 7e9)
-plt.show()
+
 #%%
 longitude_arr = convert_array1d_to_floatarray(data_csv[:,2])
 latitude_arr = convert_array1d_to_floatarray(data_csv[:,3])
@@ -103,15 +100,21 @@ nu_arr = convert_array1d_to_floatarray(data_csv[:,8])
 rho_arr = convert_array1d_to_floatarray(data_csv[:,9])
 
 
-indices_located_hahabay = points_in_bbox(longitude_arr, latitude_arr, west_haha, east_haha, north_haha, south_haha)
+#indices_located = points_in_bbox(longitude_arr, latitude_arr, west_haha, east_haha, north_haha, south_haha)
 
+west = -68.818
+east = -68.81326448878322
+north = 48.34954246746782
+south = 48.34687414439287
+
+indices_located = points_in_bbox(longitude_arr, latitude_arr, west, east, north, south)
 
 fig, axs = plt.subplots(2, 2, figsize=(10, 6))
 
-axs[0,0].plot(datetime_arr[indices_located_hahabay], h_arr[indices_located_hahabay], 'o')
-axs[0,1].plot(datetime_arr[indices_located_hahabay], E_arr[indices_located_hahabay], 'o')
-axs[1,0].plot(datetime_arr[indices_located_hahabay], nu_arr[indices_located_hahabay], 'o')
-axs[1,1].plot(datetime_arr[indices_located_hahabay], rho_arr[indices_located_hahabay], 'o')
+axs[0,0].plot(datetime_arr[indices_located], h_arr[indices_located], 'o')
+axs[0,1].plot(datetime_arr[indices_located], E_arr[indices_located], 'o')
+axs[1,0].plot(datetime_arr[indices_located], nu_arr[indices_located], 'o')
+axs[1,1].plot(datetime_arr[indices_located], rho_arr[indices_located], 'o')
 
 
 axs[0,0].set_title('thickness (m)')
