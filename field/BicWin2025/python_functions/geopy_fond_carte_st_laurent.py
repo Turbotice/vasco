@@ -39,7 +39,9 @@ ctx.add_basemap(
     alpha=1
 )
 
-ax.set_title("Région de Rimouski (haute résolution)", fontsize=14)
+ax.set_title("Baie du Ha!Ha! (haute résolution)", fontsize=14)
 plt.tight_layout()
 plt.show()
 µ# %%
+
+# %%
