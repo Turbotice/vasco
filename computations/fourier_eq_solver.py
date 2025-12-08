@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 #%%
 # Paramètres physiques
 D = 1.203e-6        # diffusivité thermique glace (wiki)
-phi_0 = 100.0   # flux au bord
+phi_0 = -150.0   # flux au bord (W/m²)
 lmbd = 2.25     # lambda glace
 T0 = 0      # température imposée à x = h(t)
 L = 0.01         # longueur max du domaine (metres)
@@ -15,7 +15,7 @@ def h(t):
 
 # Discrétisation
 Nx = 100
-Nt = 10000
+Nt = 20000
 dx = L / Nx
 dt = 0.5 * dx**2 / D  # condition de stabilité (schéma explicite)
 
@@ -33,7 +33,7 @@ for n in range(0, Nt):
         T[n+1, i] = T[n, i] + D * dt / dx**2 * (T[n, i+1] - 2*T[n, i] + T[n, i-1])
     
     # Condition au bord x=0 : dérivée donnée
-    T[n+1, 0] = T[n+1, 1] + dx * (-phi_0 / lmbd)
+    T[n+1, 0] = T[n+1, 1] + dx * (phi_0 / lmbd)
 
     # Condition au bord x=h(t)
     pos_h = h(t[n])
@@ -54,3 +54,20 @@ plt.legend()
 plt.show()
 
 # %%
+def compute_statio_temperature(h, phi_0, lambd=2.25, T0=0):
+    return T0 + (phi_0/lambd)*h
+
+print(compute_statio_temperature(1e-2,-150))
+
+fluxes = np.linspace(100, 300, 20) * (-1)
+thicknesses = np.linspace(1e-2, 0.1, 20)
+
+FF, TT = np.meshgrid(fluxes, thicknesses)
+StatioTemperatures = np.zeros_like(FF)
+
+StatioTemperatures = compute_statio_temperature(TT, FF)
+
+plt.figure()
+plt.imshow(StatioTemperatures,extent=[np.min(thicknesses), np.max(thicknesses), np.min(fluxes), np.max(fluxes)],aspect='auto')
+plt.colorbar()
+plt.show()
