@@ -7,11 +7,22 @@ import matplotlib.pyplot as plt
 # -----------------------------
 # 1. Load the SfePy result
 # -----------------------------
-disk = 'D:'
+disk = 'E:'
 
+def make_filename(E_GPa, L_mm, w_mm, h_mm, Fz):
+    """
+    Génère un nom de fichier de type :
+    plate_E3.0GPa_L80.0mm_w40.0mm_h4.0mm_Fz-10.0N.vtk
+    """
+    return (f"plate_E{E_GPa:.1f}GPa"
+            f"_L{L_mm:.0f}mm"
+            f"_w{w_mm:.0f}mm"
+            f"_h{h_mm:.2f}mm"
+            f"_Fz{Fz:.1f}N.vtk")
 
-filename = f"{disk}/FEM/results/plate_E3.0GPa_L80.0mm_w40.0mm_h4.0mm_Fz-10.0N.vtk"
-mesh = pv.read(filename)
+filename = make_filename(3, 80, 40,4, -10) #f"{disk}/FEM/results/plate_E3.0GPa_L80.0mm_w40.0mm_h4.0mm_Fz-10.0N.vtk"
+filepath = f"{disk}/FEM/results/{filename}"
+mesh = pv.read(filepath)
 
 # -----------------------------
 # 2. Convert points and displacement vectors to NumPy

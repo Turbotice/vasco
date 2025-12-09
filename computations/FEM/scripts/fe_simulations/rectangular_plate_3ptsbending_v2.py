@@ -95,20 +95,18 @@ def post_proces(out, pb, state, extend=False):
 # INPUTS
 #Fz = -10 # force along z in Newtons (for 3 points bending, negative sign)
 Fz = -2 # float(input('Applied force Fz (N) ? '))
-E = 9e9 # float(input("Young's modulus (GPa) ? ")) * 1e9
+E = 3e9 # float(input("Young's modulus (GPa) ? ")) * 1e9
 
-filename_mesh = data_dir + '/meshes/3d/3drect_plate.mesh'
-filename_info = data_dir + '/meshes/3d/plate_info.txt'
-filename_nodesTopMiddleLine = data_dir + '/meshes/3d/nodes_TopMiddleLine.txt'
+plate_length_x = 8e-2
+plate_width_y = 4e-2
+plate_thickness_z = 2e-3
+nx_cells = 40
+ny_cells = 20
+nz_cells = 10
 
-plate_info = np.loadtxt(filename_info)
+filename_mesh = data_dir + '/meshes/3d/3drect_plate_L{np.round(plate_length_x*1e3).astype(int)}mm_w{np.round(plate_width_y*1e3).astype(int)}mm_h{np.round(plate_thickness_z*1e3).astype(int)}mm_nx{nx_cells}_ny{ny_cells}_nz{nz_cells}.mesh'
+filename_nodesTopMiddleLine = data_dir + '/meshes/3d/nodes_TopMiddleLine_L{np.round(plate_length_x*1e3).astype(int)}mm_w{np.round(plate_width_y*1e3).astype(int)}mm_h{np.round(plate_thickness_z*1e3).astype(int)}mm_nx{nx_cells}_ny{ny_cells}_nz{nz_cells}.txt'
 
-plate_length_x = plate_info[0]
-plate_width_y = plate_info[1]
-plate_thickness_z = plate_info[2]
-nx_cells = plate_info[3]
-ny_cells = plate_info[4]
-nz_cells = plate_info[5]
 
 data_nodesTopMiddleLine = np.loadtxt(filename_nodesTopMiddleLine)
 arr_indicesTopMiddleLine = data_nodesTopMiddleLine[:,0]

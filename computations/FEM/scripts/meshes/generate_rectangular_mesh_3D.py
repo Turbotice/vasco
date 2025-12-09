@@ -3,7 +3,7 @@
 # distances in m :
 plate_length_x = 8e-2      # total extent in x-direction
 plate_width_y = 4e-2       # total extent in y-direction
-plate_thickness_z = 4e-3   # total extent in z-direction
+plate_thickness_z = 2e-3   # total extent in z-direction
 
 nx_cells = 40              # number of elements along x
 ny_cells = 20              # number of elements along y
@@ -54,7 +54,7 @@ print(f"Generated hexahedra: {num_hex}")
 
 # write .mesh file
 disk = 'D:'
-out_path = f"{disk}/FEM/meshes/3d/3drect_plate.mesh"
+out_path = f"{disk}/FEM/meshes/3d/3drect_plate_L{np.round(plate_length_x*1e3).astype(int)}mm_w{np.round(plate_width_y*1e3).astype(int)}mm_h{np.round(plate_thickness_z*1e3).astype(int)}mm_nx{nx_cells}_ny{ny_cells}_nz{nz_cells}.mesh"
 with open(out_path, "w") as f:
     f.write("MeshVersionFormatted 2\n")
     f.write("Dimension 3\n\n")
@@ -119,10 +119,10 @@ plotter.show_bounds(
 plotter.show()
 
 # %% save the characteristics of the rectangular plate
-
+"""
 data2save = np.array([plate_length_x,plate_width_y,plate_thickness_z,nx_cells,ny_cells,nz_cells])
 np.savetxt(f"{disk}/FEM/meshes/3d/plate_info.txt",data2save)
-
+"""
 # %% save the points on which to apply the force (3pts bending)
 
 tol = 1e-6  # or slightly larger if needed
@@ -145,6 +145,7 @@ nodes_TopMiddleLine = nodes[indices_TopMiddleLine,:]
 data2save = np.zeros((nodes_TopMiddleLine.shape[0],4))
 data2save[:,1:] = nodes_TopMiddleLine
 data2save[:,0] = indices_TopMiddleLine.T
-np.savetxt(f"{disk}/FEM/meshes/3d/nodes_TopMiddleLine.txt",data2save)
+#np.savetxt(f"{disk}/FEM/meshes/3d/nodes_TopMiddleLine.txt",data2save)
+np.savetxt(f"{disk}/FEM/meshes/3d/nodes_TopMiddleLine_L{np.round(plate_length_x*1e3).astype(int)}mm_w{np.round(plate_width_y*1e3).astype(int)}mm_h{np.round(plate_thickness_z*1e3).astype(int)}mm_nx{nx_cells}_ny{ny_cells}_nz{nz_cells}.txt",data2save)
 
 # %%
